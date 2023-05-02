@@ -3,5 +3,8 @@ module Main (main) where
 
 import Basis
 
+ket_01_bra :: QV (Bool, Bool)
+ket_01_bra = qv [(False, 1)] &* qv [(True, 1)]
+
 main :: IO ()
-main = print qVal
+main = print ket_01_bra

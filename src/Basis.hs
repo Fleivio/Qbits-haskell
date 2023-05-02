@@ -23,7 +23,7 @@ type QV a = Map a PA
 -- Transforma um array de tuplas (estado, probabilidade) em QV
 qv :: Basis a => [(a, PA)] -> QV a
 qv vals = fromList filteredQv
-    where filteredQv = Prelude.filter (\(a, pa) -> pa /= 0) vals
+    where filteredQv = Prelude.filter (\(_, pa) -> pa /= 0) vals
 
 -- Retorna a probabilidade associada a um estado
 pr :: Basis a => QV a -> a -> PA

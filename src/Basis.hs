@@ -1,4 +1,4 @@
-module Basis (boolBasis, qv, pr, qVal) where
+module Basis (qv, pr, qVal) where
 
 import Data.Complex
 import Data.Map
@@ -9,9 +9,6 @@ class (Eq a, Ord a) => Basis a where
 instance Basis Bool where
     basis = [False, True]
 
-
-boolBasis :: IO()
-boolBasis = print (basis :: [Bool])
 
 type PA = Complex Double -- Probability Amplitude
 type QV a = Map a PA     -- Quantum Value
@@ -32,4 +29,14 @@ qFalse = qv [(False, 1)]
 qTrue = qv [(True, 1)]
 
 -- estado 50/50
-qVal = qv [(False, 1 / sqrt 2), (True, 1 / sqrt 2) ] 
+qVal = qv [(False, 1 / sqrt 2), (True, 1 / sqrt 2) ]
+
+instance (Basis a, Basis b) => Basis (a,b) where
+    basis = [(a, b) | a <- basis, b <- basis]
+
+-- Produto tensorial
+(&*) :: (Basis a, Basis b) => QV a -> QV b -> QV (a,b)
+(&*) qa qb = qv [ ( (a,b) , pr qa a * pr qb b) | (a,b) <- basis] 
+
+-- estados emaranhados
+eStates = qv [((False, False), 1), ((True, True), 1)]

@@ -2,9 +2,9 @@ name:                quantik
 version:             0.1.0.0
 github:              "githubuser/quantik"
 license:             BSD3
-author:              "Author name here"
-maintainer:          "example@example.com"
-copyright:           "2023 Author name here"
+author:              "Flávio Borin Júnior"
+maintainer:          "flavioborinjunior@gmail.com"
+copyright:           "2023 Flávio Borin Júnior"
 
 extra-source-files:
 - README.md
@@ -35,6 +35,8 @@ ghc-options:
 
 library:
   source-dirs: src
+  dependencies:
+  - containers
 
 executables:
   quantik-exe:

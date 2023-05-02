@@ -1,6 +1,7 @@
+{-# OPTIONS_GHC -Wno-deferred-out-of-scope-variables #-}
 module Main (main) where
 
-import Lib
+import Basis
 
 main :: IO ()
-main = someFunc
+main = print qVal

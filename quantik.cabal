@@ -9,9 +9,9 @@ version:        0.1.0.0
 description:    Please see the README on GitHub at <https://github.com/githubuser/quantik#readme>
 homepage:       https://github.com/githubuser/quantik#readme
 bug-reports:    https://github.com/githubuser/quantik/issues
-author:         Author name here
-maintainer:     example@example.com
-copyright:      2023 Author name here
+author:         Flávio Borin Júnior
+maintainer:     flavioborinjunior@gmail.com
+copyright:      2023 Flávio Borin Júnior
 license:        BSD3
 license-file:   LICENSE
 build-type:     Simple
@@ -25,7 +25,7 @@ source-repository head
 
 library
   exposed-modules:
-      Lib
+      Basis
   other-modules:
       Paths_quantik
   hs-source-dirs:
@@ -33,6 +33,7 @@ library
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
   build-depends:
       base >=4.7 && <5
+    , containers
   default-language: Haskell2010
 
 executable quantik-exe

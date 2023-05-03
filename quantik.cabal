@@ -27,6 +27,8 @@ library
   exposed-modules:
       Basis
       Operators
+      ProbabilityAmplitude
+      QuantumValue
   other-modules:
       Paths_quantik
   hs-source-dirs:

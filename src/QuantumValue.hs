@@ -4,6 +4,8 @@ import Basis (Basis (..))
 import Data.Map (Map, findWithDefault, fromList, toList)
 import ProbabilityAmplitude (PA, paToString)
 
+import Data.List (intercalate)
+
 type QV a = Map a PA
 
 -- Probabilidade associada a um estado
@@ -22,7 +24,7 @@ toQv vals = fromList filteredQv
 
 -- Converte para notação bra-ket
 braketConvert :: (Show a) => QV a -> String
-braketConvert qvalue = foldl1 (++) [paToString pa ++ "*|" ++ show a ++ "⟩" | (a, pa) <- toList qvalue]
+braketConvert qvalue = intercalate " + " [paToString pa ++ " * |" ++ show a ++ "⟩" | (a, pa) <- toList qvalue]
 
 -- EXEMPLOS
 

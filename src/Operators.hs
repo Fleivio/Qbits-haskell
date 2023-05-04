@@ -1,24 +1,35 @@
-module Operators (hGate, xGate, yGate, zGate) where
+module Operators (hGate, xGate, yGate, zGate, qop, qApp) where
 
 import QuantumValue
 import Data.Complex
+import Data.Map
+import Basis
+import ProbabilityAmplitude
 
-xGate :: QV Bool -> QV Bool 
-xGate qval = let a = getProb qval False
-                 b = getProb qval True
-             in toQv [(False, b), (True, a)]
+data Qop a b = Qop ( Map (a, b) PA)
 
-yGate :: QV Bool -> QV Bool
-yGate qval = let a = getProb qval False * (0 :+ 1)
-                 b = getProb qval True  * (0 :+ (-1))
-             in toQv [(False, b), (True, a)]
+qop :: (Basis a, Basis b) => [((a,b), PA)] -> Qop a b
+qop = Qop . fromList
 
-zGate :: QV Bool -> QV Bool
-zGate qval = let a = getProb qval False
-                 b = getProb qval True * (-1)
-             in toQv [(False, a), (True, b)]
+qApp :: (Basis a, Basis b) => Qop a b -> QV a -> QV b
+qApp (Qop mp) qval = toQv [ (b, bF b) | b <- basis ]
+    where
+        bF b = sum [ getProb mp (a, b) * getProb qval a | a <- basis]
 
-hGate :: QV Bool -> QV Bool
-hGate qval = let a = getProb qval False
-                 b = getProb qval True 
-             in  toQv [(False, a + b), (True, a - b)]
+xGate :: Qop Bool Bool
+xGate = qop [((False, True), 1),
+             ((True, False), 1)]
+
+yGate :: Qop Bool Bool
+yGate = qop [((False, True), 0 :+ (-1)),
+         ((True, False), 0 :+ 1)]
+
+zGate :: Qop Bool Bool
+zGate = qop [((False, False), 1),
+         ((True, True) , 0)]
+
+hGate :: Qop Bool Bool
+hGate = qop [((False, False), 1),
+          ((False, True), 1),
+          ((True, False), 1),
+          ((True, True), -1) ]

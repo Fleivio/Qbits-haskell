@@ -24,7 +24,7 @@ toQv vals = fromList filteredQv
 
 -- Converte para notação bra-ket
 braketConvert :: (Show a) => QV a -> String
-braketConvert qvalue = intercalate " + " [paToString pa ++ " * |" ++ show a ++ "⟩" | (a, pa) <- toList qvalue]
+braketConvert qvalue = intercalate " + " [paToString pa ++ " ⋅ |" ++ show a ++ "⟩" | (a, pa) <- toList qvalue]
 
 -- EXEMPLOS
 

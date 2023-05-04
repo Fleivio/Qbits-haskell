@@ -13,6 +13,12 @@ ket_01_11_bra = toQv [(False, 1/sqrt 2), (True, 1/sqrt 2) ] &* toQv [(True, 1)]
 genQv :: PA -> PA -> QV Bool
 genQv a b = toQv [(False, a), (True, b)]
 
+genQv2 :: PA -> PA -> PA -> PA -> QV (Bool, Bool)
+genQv2 a b c d = toQv [((False, False), a),
+                      ((False, True), b),
+                      ((True, False), c),
+                      ((True, True), d)]
+
 bell_01 :: QV (Bool, Bool)
 bell_01 = toQv [ ((True, True), 1 / sqrt 2), ((False, False), 1 / sqrt 2) ]
 
@@ -34,6 +40,8 @@ print_gate_tests = do
      putStrLn $ "X |1> = " ++ braketConvert (qApp xGate (genQv 0 1))
      putStrLn $ "H |0> = " ++ braketConvert (qApp hGate (genQv 1 0))
      putStrLn $ "Y |0> = " ++ braketConvert (qApp yGate (genQv 1 0))
+     putStrLn $ "CNOT |11> = " ++ braketConvert (qApp cnot (genQv2 0 0 0 1))
+     putStrLn $ "ENTANG |0> |0> = " ++ braketConvert (entangle (genQv 1 0) (genQv 1 0))
 
 main :: IO ()
-main = print_tests
+main = print_gate_tests

@@ -1,4 +1,4 @@
-module Operators (hGate, xGate, yGate, zGate, qop, qApp, cnot) where
+module Operators (hGate, xGate, yGate, zGate, qop, qApp, cnot, entangle) where
 
 import QuantumValue
 import Data.Complex
@@ -6,7 +6,7 @@ import Data.Map
 import Basis
 import ProbabilityAmplitude
 
-data Qop a b = Qop ( Map (a, b) PA)
+data Qop a b = Qop (Map (a, b) PA)
 
 qop :: (Basis a, Basis b) => [((a,b), PA)] -> Qop a b
 qop = Qop . fromList
@@ -47,3 +47,6 @@ cqop enable (Qop u) = qop ( unchangeCase ++ changeCase )
 
 cnot :: Qop (Bool, Bool) (Bool, Bool)
 cnot = cqop id xGate
+
+entangle :: QV Bool -> QV Bool -> QV (Bool, Bool) 
+entangle q1 q2 = qApp cnot ((qApp hGate q1) &* q2)

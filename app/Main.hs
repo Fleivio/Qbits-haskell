@@ -1,4 +1,3 @@
-{-# OPTIONS_GHC -Wno-deferred-out-of-scope-variables #-}
 module Main (main) where
 
 import QuantumValue
@@ -17,8 +16,9 @@ genQv a b = toQv [(False, a), (True, b)]
 bell_01 :: QV (Bool, Bool)
 bell_01 = toQv [ ((True, True), 1 / sqrt 2), ((False, False), 1 / sqrt 2) ]
 
-test_3_base :: QV [Bool]
-test_3_base = toQv [ ([True, False, True], 1), ([False, False, True], 1) ]
+test_3_base :: QV ((Bool, Bool), Bool)
+test_3_base = toQv [ (((True, False), True), 1), (((False, False), (True)), 1) ]
+
 
 print_tests :: IO ()
 print_tests = do
@@ -36,4 +36,4 @@ print_gate_tests = do
      putStrLn $ "Y |0> = " ++ braketConvert (qApp yGate (genQv 1 0))
 
 main :: IO ()
-main = print_gate_tests
+main = print_tests

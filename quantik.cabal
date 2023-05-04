@@ -7,8 +7,8 @@ cabal-version: 1.12
 name:           quantik
 version:        0.1.0.0
 description:    Please see the README on GitHub at <https://github.com/githubuser/quantik#readme>
-homepage:       https://github.com/githubuser/quantik#readme
-bug-reports:    https://github.com/githubuser/quantik/issues
+homepage:       https://github.com/Fleivio/Quantik#readme
+bug-reports:    https://github.com/Fleivio/Quantik/issues
 author:         Flávio Borin Júnior
 maintainer:     flavioborinjunior@gmail.com
 copyright:      2023 Flávio Borin Júnior
@@ -21,7 +21,7 @@ extra-source-files:
 
 source-repository head
   type: git
-  location: https://github.com/githubuser/quantik
+  location: https://github.com/Fleivio/Quantik
 
 library
   exposed-modules:

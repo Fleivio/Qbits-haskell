@@ -1,6 +1,6 @@
 name:                quantik
 version:             0.1.0.0
-github:              "githubuser/quantik"
+github:              "https://github.com/Fleivio/Quantik"
 license:             BSD3
 author:              "Flávio Borin Júnior"
 maintainer:          "flavioborinjunior@gmail.com"

@@ -36,8 +36,6 @@ hGate = qop [((False, False), 1),
              ((True, False), 1),
              ((True, True), -1) ]
 
--- opLift :: (Basis a, Basis b) => (a -> b) -> Qop a b
--- opLift f = qop [ ((a, f a), 1) | a <- basis ]
 
 cqop :: (Basis a, Basis b) => (a -> Bool) -> Qop b b -> Qop (a, b) (a, b)
 cqop enable (Qop u) = qop ( unchangeCase ++ changeCase )
@@ -48,5 +46,17 @@ cqop enable (Qop u) = qop ( unchangeCase ++ changeCase )
 cnot :: Qop (Bool, Bool) (Bool, Bool)
 cnot = cqop id xGate
 
+toffoli :: Qop ((Bool, Bool), Bool) ((Bool, Bool), Bool)
+toffoli = cqop (uncurry (&&)) xGate
+
 entangle :: QV Bool -> QV Bool -> QV (Bool, Bool) 
 entangle q1 q2 = qApp cnot ((qApp hGate q1) &* q2)
+
+norm :: Basis a => QV a -> Double
+norm v = sqrt . sum $ probs
+    where probs = Prelude.map squareModulus (Prelude.map snd (toList v))
+
+normalize :: Basis a => QV a -> QV a 
+normalize qval = Data.Map.map (c*) qval
+    where
+        c = (1 / norm qval :+ 0)

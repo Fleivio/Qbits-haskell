@@ -1,8 +1,8 @@
 module QuantumValue (getProb, (&*), toQv, braketConvert, QV) where
 
-import Basis (Basis (..))
-import Data.Map (Map, findWithDefault, fromList, toList)
-import ProbabilityAmplitude (PA, paToString)
+import Basis
+import Data.Map (Map, findWithDefault, toList, fromList)
+import ProbabilityAmplitude
 
 import Data.List (intercalate)
 

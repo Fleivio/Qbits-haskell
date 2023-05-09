@@ -45,10 +45,10 @@ _print_gate_tests = do
 refTest :: IO ()
 refTest = do
         a <- mkQR (qApp hGate bra_0_ket &* bra_1_ket &* bra_0_ket)
-        o3 <- observeRight a
-        putStrLn $ "valor observado na direita: " ++ show o3
-        o1 <- observeReference a
-        o2 <- observeReference a
+        o3 <- observeLeft a
+        putStrLn $ "valor observado na esquerda: " ++ show o3
+        o1 <- observe a
+        o2 <- observe a
         print (o1, o2)
 
 

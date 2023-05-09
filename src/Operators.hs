@@ -1,13 +1,16 @@
-module Operators (qop, qApp, cqop, normalize, Qop) where
+module Operators (qop, qApp, cqop, normalize, Qop, observeV) where
 
-import QuantumValue
-import Data.Complex
+import QuantumValue ( getProb, toQv, QV )
+import ProbabilityAmplitude ( squareModulus, PA )
+import Basis ( Basis(..) )
+
 import Data.Map as Map (Map, fromList, toList, map)
-import Basis
-import ProbabilityAmplitude
+import Data.Foldable (find)
+import System.Random ( getStdRandom, Random(randomR) )
+import Data.Complex ( Complex((:+)) )
 import Prelude as P
 
-data Qop a b = Qop (Map (a, b) PA)
+newtype Qop a b = Qop (Map (a, b) PA)
 
 qop :: (Basis a, Basis b) => [((a,b), PA)] -> Qop a b
 qop = Qop . fromList
@@ -20,16 +23,26 @@ cqop enable (Qop u) = qop ( unchangeCase ++ changeCase )
 
 qApp :: (Basis a, Basis b) => Qop a b -> QV a -> QV b
 qApp (Qop mp) qval = toQv [ (b, probB b) | b <- basis ]
-    where 
+    where
         probB b = sum [ probToMap (a, b) * probOriginal a | a <- basis ]
         probOriginal = getProb qval
         probToMap = getProb mp
 
 norm :: QV a -> Double
 norm v = sqrt . sum $ probs
-    where probs = P.map squareModulus (P.map snd (toList v))
+    where probs = P.map (squareModulus . snd) (toList v)
 
-normalize :: QV a -> QV a 
+normalize :: QV a -> QV a
 normalize qval = Map.map (c*) qval
     where
-        c = (1 / norm qval :+ 0)
+        c = 1 / norm qval :+ 0
+
+observeV :: Basis a => QV a -> IO a
+observeV v =
+    do
+        let nv = normalize v
+            probs = P.map (squareModulus . getProb nv) basis
+        r <- getStdRandom (randomR (0.0, 1.0))
+        let cPsCs = zip (scanl1 (+) probs) basis
+            Just (_, res) = find (\(p, _) -> r < p) cPsCs
+        return res

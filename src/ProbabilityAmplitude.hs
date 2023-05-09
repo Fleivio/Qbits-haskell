@@ -12,4 +12,4 @@ paToString pa
             | otherwise        = printf "%.1f" (realPart pa)
 
 squareModulus :: Complex Double -> Double
-squareModulus a = (^2) $ magnitude a
+squareModulus a = (**2) $ magnitude a

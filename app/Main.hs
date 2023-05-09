@@ -4,6 +4,7 @@ import QuantumValue
 import Operators
 import ProbabilityAmplitude
 import BoolOperators
+import Reference
 
 
 ket_01_bra :: QV (Bool, Bool)
@@ -21,14 +22,14 @@ genQv2 a b c d = normalize $ toQv [((False, False), a),
                       ((True, False), c),
                       ((True, True), d) ] 
 
-print_tests :: IO ()
-print_tests = do
+_print_tests :: IO ()
+_print_tests = do
      putStrLn $ "|01> = " ++ braketConvert ket_01_bra
      putStrLn $ "|01> + |11> = " ++ braketConvert ket_01_11_bra
      putStrLn $ " 1 |0> + 2 |1> = " ++ braketConvert (genQv 1 2)
 
-print_gate_tests :: IO ()
-print_gate_tests = do
+_print_gate_tests :: IO ()
+_print_gate_tests = do
      putStrLn $ "X |0> = " ++ braketConvert (qApp xGate (genQv 1 0))
      putStrLn $ "X |1> = " ++ braketConvert (qApp xGate (genQv 0 1))
      putStrLn $ "H |0> = " ++ braketConvert (qApp hGate (genQv 1 0))
@@ -40,5 +41,16 @@ print_gate_tests = do
      putStrLn $ "bell psiM = " ++ braketConvert (bra_psi_m_ket)
      putStrLn $ "TOFF |110> = " ++ braketConvert (qApp toffoli ((genQv 0 1) &* (genQv 0 1) &* (genQv 1 0) ))
 
+
+refTest :: IO ()
+refTest = do
+        a <- mkQR (qApp hGate bra_0_ket &* bra_1_ket &* bra_0_ket)
+        o3 <- observeRight a
+        putStrLn $ "valor observado na direita: " ++ show o3
+        o1 <- observeReference a
+        o2 <- observeReference a
+        print (o1, o2)
+
+
 main :: IO ()
-main = print_gate_tests
+main = refTest

@@ -1,5 +1,4 @@
 module QuantumValue (getProb, (&*), toQv, braketConvert, QV) where
-
 import Basis
 import Data.Map (Map, findWithDefault, toList, fromList)
 import ProbabilityAmplitude
@@ -16,8 +15,8 @@ getProb qvalue index = Data.Map.findWithDefault 0 index qvalue
 
 toQv :: Basis a => [(a, PA)] -> QV a
 toQv = fromList . filterZeros
-	where
-		filterZeros = filter (\(_, pa) -> pa /= 0)
+  where
+    filterZeros = filter (\(_, pa) -> pa /= 0)
 
 braketConvert :: (Show a) => QV a -> String
 braketConvert qvalue = intercalate " + " [paToString pa ++ " ⋅ |" ++ show a ++ "⟩" | (a, pa) <- toList qvalue]

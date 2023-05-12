@@ -1,23 +1,40 @@
 module Main (main) where
 
+import Control.Concurrent
 import BB84
 
-bb84test :: IO ()
-bb84test = do
-  (a, b) <- bb84 10
-  prsObservations a
-  prsObservations b
-  let key = bb84Discard a b
-  putStrLn $ "Chave: " ++ show key
+main :: IO()
+main = do
+  (alice, bob) <- bb84 10
+  printObservations alice
+  printObservations bob
+  let key = bb84Discard alice bob
+  print key   
 
-bb84InterferenceTest :: IO()
-bb84InterferenceTest = do
-  (a, t, b) <- bb84Interference 10
-  prsObservations a
-  prsObservations t
-  prsObservations b
-  let key = bb84Discard a b
-  putStrLn $ "Chave: " ++ show key
+-- main :: IO ()
+-- main = do
+--   channel <- newChan
 
-main :: IO ()
-main = bb84InterferenceTest
+--   _ <- forkIO (threadA channel 10)
+--   _ <- forkIO (threadB channel 10)
+
+--   threadDelay 2000000
+
+-- threadA :: Chan Int -> Int -> IO ()
+-- threadA channel size = do
+--   let vec = take size [1..]
+
+--   mapM_ (writeChan channel) vec
+
+-- threadB :: Chan Int -> Int -> IO ()
+-- threadB channel size = do
+--   vec <- loop size
+--   print vec
+--     where
+--       loop sz
+--         | sz == 0 = return []
+--         | otherwise = do
+--           e <- readChan channel
+--           putStrLn $ "lido " ++ show e ++ "\n"
+--           vec <- loop (sz - 1)
+--           return $ e : vec

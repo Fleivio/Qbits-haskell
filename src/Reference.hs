@@ -1,15 +1,17 @@
-module Reference (mkQR, observe, observeRight, observeLeft) where
+module Reference (mkQR, observe, observeRight, observeLeft, QR, qrApplyOp, observeAtBasis, Base(..)) where
 
 import QuantumValue ( QV, getProb, toQv )
 import Data.Map (singleton)
 import Data.IORef ( IORef, newIORef, readIORef, writeIORef )
-import Operators ( normalize, observeV )
+import Operators
+import BoolOperators
 import Basis ( Basis(..) )
 import Data.Complex ( Complex((:+)) )
 
 import ProbabilityAmplitude (squareModulus)
 
-newtype QR a = QR(IORef (QV a))
+data QR a = QR(IORef (QV a))
+data Base = X | Z deriving (Show, Eq)
 
 -- retorna uma referencia ao valor QR
 mkQR :: QV a -> IO(QR a)
@@ -51,3 +53,19 @@ observeRight (QR ptrQval) =
         writeIORef ptrQval (normalize nv)
         return observResult
 
+qrApplyOp :: (Basis a) => Qop a a -> QR a -> IO()
+qrApplyOp op (QR ptrQval) =
+    do
+        qVal <- readIORef ptrQval
+        let tqv = qApp op qVal
+        writeIORef ptrQval tqv
+
+observeAtBasis :: Base -> QR Bool -> IO Bool
+observeAtBasis Z qr = 
+    do
+        qrApplyOp idGate qr
+        observe qr
+observeAtBasis X qr = 
+    do
+        qrApplyOp hGate qr
+        observe qr

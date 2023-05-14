@@ -72,7 +72,6 @@ observeAtBasis X qr =
         qrApplyOp hGate qr
         return a
 
-
 refToString ::(Show a) => QR a -> IO String 
 refToString (QR ioref) = do
     qval <- readIORef ioref 

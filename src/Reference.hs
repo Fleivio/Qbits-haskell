@@ -1,6 +1,6 @@
-module Reference (mkQR, observe, observeRight, observeLeft, QR, qrApplyOp, observeAtBasis, Base(..)) where
+module Reference (mkQR, observe, observeRight, observeLeft, QR, qrApplyOp, observeAtBasis, Base(..), printRef, refToString) where
 
-import QuantumValue ( QV, getProb, toQv )
+import QuantumValue ( QV, getProb, toQv, braketConvert)
 import Data.Map (singleton)
 import Data.IORef ( IORef, newIORef, readIORef, writeIORef )
 import Operators
@@ -68,4 +68,17 @@ observeAtBasis Z qr =
 observeAtBasis X qr = 
     do
         qrApplyOp hGate qr
-        observe qr
+        a <- observe qr
+        qrApplyOp hGate qr
+        return a
+
+
+refToString ::(Show a) => QR a -> IO String 
+refToString (QR ioref) = do
+    qval <- readIORef ioref 
+    return $ braketConvert qval
+
+printRef :: (Show a) => QR a -> IO()
+printRef (QR ioref) = do
+    qval <- readIORef ioref 
+    putStrLn $ braketConvert qval

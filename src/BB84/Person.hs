@@ -1,4 +1,4 @@
-module BB84.Person(Person(Person, readBasis, obsRes), PersonRef(PersonRef), discardDifferentBasis, printObservations, mkPersonRef, getPerson) where
+module BB84.Person(Person(Person, readBasis, obsRes), PersonRef(PersonRef), printObservations, mkPersonRef, getPerson) where
 
 import Reference
 import Data.IORef (IORef, newIORef, readIORef)
@@ -14,10 +14,6 @@ mkPersonRef :: IO PersonRef
 mkPersonRef = do
   a <- newIORef $ Person [] []
   return $ PersonRef a
-
-discardDifferentBasis :: Person -> Person -> [Bool]
-discardDifferentBasis alice bob = [ bit | (a, b, bit) <- zipQbits, a == b ]
-  where zipQbits = zip3 (readBasis alice) (readBasis bob) (obsRes alice)
 
 printObservations :: Person -> IO ()
 printObservations person = do

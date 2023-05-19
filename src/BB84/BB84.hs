@@ -3,8 +3,9 @@ module BB84.BB84 (bb84, bb84Interf, discardDifferentBasis, verifyInterference) w
 import BB84.Person
 import BB84.Generator
 import Control.Concurrent
-import Reference
+import Basic.Reference
 import Data.IORef (writeIORef)
+import BoolOperators
 
 genQbits :: PersonRef -> Chan (QR Bool) -> Int -> IO()
 genQbits (PersonRef aliceRef) qChan size = do

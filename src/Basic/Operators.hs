@@ -1,12 +1,11 @@
-module Operators (qop, qApp, cqop, normalize, Qop, observeV) where
+module Basic.Operators (qop, qApp, cqop, normalize, Qop) where
 
-import QuantumValue ( getProb, toQv, QV )
-import ProbabilityAmplitude ( squareModulus, PA )
-import Basis ( Basis(..) )
+import Basic.QuantumValue ( getProb, toQv, QV )
+import Basic.ProbabilityAmplitude ( squareModulus, PA )
+import Basic.Basis ( Basis(..) )
 
 import Data.Map as Map (Map, fromList, toList, map)
-import Data.Foldable (find)
-import System.Random ( getStdRandom, Random(randomR) )
+
 import Data.Complex ( Complex((:+)) )
 import Prelude as P
 
@@ -37,12 +36,3 @@ normalize qval = Map.map (c*) qval
     where
         c = 1 / norm qval :+ 0
 
-observeV :: Basis a => QV a -> IO a
-observeV v =
-    do
-        let nv = normalize v
-            probs = P.map (squareModulus . getProb nv) basis
-        r <- getStdRandom (randomR (0.0, 1.0))
-        let cPsCs = zip (scanl1 (+) probs) basis
-            Just (_, res) = find (\(p, _) -> r < p) cPsCs
-        return res

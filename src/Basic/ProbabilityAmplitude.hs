@@ -1,4 +1,4 @@
-module ProbabilityAmplitude (paToString, PA, squareModulus) where
+module Basic.ProbabilityAmplitude (paToString, PA, squareModulus) where
 
 import Data.Complex
 import Text.Printf

@@ -1,6 +1,6 @@
 module BB84.Person(Person(Person, readBasis, obsRes), PersonRef(PersonRef), printObservations, mkPersonRef, getPerson) where
 
-import Reference
+import Basic.Reference
 import Data.IORef (IORef, newIORef, readIORef)
 
 data Person = Person

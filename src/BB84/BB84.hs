@@ -1,4 +1,4 @@
-module BB84.BB84 (bb84, bb84Interf, sequentialBb84, sequentialBb84Interf, discardDifferentBasis, verifyInterference) where
+module BB84.BB84 (bb84, bb84Interf, discardDifferentBasis, verifyInterference) where
 
 import BB84.Person
 import BB84.Generator
@@ -8,7 +8,7 @@ import Data.IORef (writeIORef)
 
 genQbits :: PersonRef -> Chan (QR Bool) -> Int -> IO()
 genQbits (PersonRef aliceRef) qChan size = do
-  basis <- genBaseSet size
+  basis <- genBasisSet size
   bits <- genBitSet size
   let alice = Person basis bits
   writeIORef aliceRef alice
@@ -19,7 +19,7 @@ genQbits (PersonRef aliceRef) qChan size = do
 
 interceptQbits :: PersonRef -> Chan (QR Bool) -> Chan (QR Bool) -> Int -> IO()
 interceptQbits (PersonRef trudyRef) inChan outChan size = do
-  basis <- genBaseSet size
+  basis <- genBasisSet size
   observations <- readVecFromChan basis size
   let trudy = Person basis observations
   writeIORef trudyRef trudy
@@ -35,7 +35,7 @@ interceptQbits (PersonRef trudyRef) inChan outChan size = do
 
 receiveQbits :: PersonRef -> Chan (QR Bool) -> Int -> IO()
 receiveQbits (PersonRef bobRef) chan size = do
-  basis <- genBaseSet size
+  basis <- genBasisSet size
   observations <- readVecFromChan basis size
   let bob = Person basis observations
   writeIORef bobRef bob
@@ -74,35 +74,6 @@ bb84Interf size = do
   alice <- getPerson aliceRef
   bob <- getPerson bobRef
   trudy <- getPerson trudyRef
-  return (alice, trudy, bob)
-
-sequentialGenQbits :: Int -> IO (Person, [QR Bool])
-sequentialGenQbits n = do
-  basis <- genBaseSet n
-  bits <- genBitSet n
-  qbits <- prepareQbits bits basis
-  let alice = Person basis bits
-  return (alice, qbits)
-
-sequentialReceiveQbits :: [QR Bool] -> IO Person
-sequentialReceiveQbits inputQbits = do
-  basis <- genBaseSet (length inputQbits)
-  let obsIO = sequence [observeAtBasis base qref | (base, qref) <- zip basis inputQbits]
-  obs <- obsIO
-  let bob = Person basis obs
-  return bob
-
-sequentialBb84 :: Int -> IO (Person, Person)
-sequentialBb84 size = do
-  (alice, qbits) <- sequentialGenQbits size
-  bob <- sequentialReceiveQbits qbits
-  return (alice, bob)
-
-sequentialBb84Interf :: Int -> IO (Person, Person, Person)
-sequentialBb84Interf size = do
-  (alice, qbits) <- sequentialGenQbits size
-  trudy <- sequentialReceiveQbits qbits
-  bob <- sequentialReceiveQbits qbits
   return (alice, trudy, bob)
 
 discardDifferentBasis :: Person -> Person -> ([Bool], [Bool])

@@ -1,4 +1,4 @@
-module Reference (mkQR, observe, observeRight, observeLeft, QR, qrApplyOp, observeAtBasis, Base(..), printRef, refToString) where
+module Reference (mkQR, observe, observeRight, observeLeft, QR, qrApplyOp, observeAtBasis, ObsBasis(..), printRef, refToString) where
 
 import QuantumValue ( QV, getProb, toQv, braketConvert)
 import Data.Map (singleton)
@@ -11,7 +11,7 @@ import Data.Complex ( Complex((:+)) )
 import ProbabilityAmplitude (squareModulus)
 
 data QR a = QR(IORef (QV a))
-data Base = X | Z deriving (Show, Eq)
+data ObsBasis = X | Z deriving (Show, Eq)
 
 -- retorna uma referencia ao valor QR
 mkQR :: QV a -> IO(QR a)
@@ -60,7 +60,7 @@ qrApplyOp op (QR ptrQval) =
         let tqv = qApp op qVal
         writeIORef ptrQval tqv
 
-observeAtBasis :: Base -> QR Bool -> IO Bool
+observeAtBasis :: ObsBasis -> QR Bool -> IO Bool
 observeAtBasis Z qr = 
     do
         qrApplyOp idGate qr

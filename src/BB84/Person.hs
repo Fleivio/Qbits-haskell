@@ -4,7 +4,7 @@ import Reference
 import Data.IORef (IORef, newIORef, readIORef)
 
 data Person = Person
-  { readBasis :: [Base],
+  { readBasis :: [ObsBasis],
     obsRes :: [Bool]
   }
 

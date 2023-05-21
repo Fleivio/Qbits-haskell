@@ -12,6 +12,7 @@ import System.Random ( getStdRandom, Random(randomR) )
 import Prelude as P
 import Data.Complex
 
+-- observa um valor quatnico, retorna o resultado
 observeV :: Basis a => QV a -> IO a
 observeV v =
     do

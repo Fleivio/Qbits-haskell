@@ -1,7 +1,7 @@
 module BB84.Person(Person(Person, readBasis, obsRes), PersonRef(PersonRef), printObservations, mkPersonRef, getPerson) where
 
-import Basic.Reference
 import Data.IORef (IORef, newIORef, readIORef)
+import BoolOperators
 
 data Person = Person
   { readBasis :: [ObsBasis],

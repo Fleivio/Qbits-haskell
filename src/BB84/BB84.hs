@@ -1,4 +1,4 @@
-module BB84.BB84 (bb84, bb84Interf, discardDifferentBasis, verifyInterference) where
+module BB84.BB84 (bb84run, bb84interfRun) where
 
 import BB84.Person
 import BB84.Generator
@@ -90,3 +90,21 @@ verifyInterference alice bob = do
       hadInterf = False `elem` ([ a == b | (a,b) <- zip aliceK bobK ])
   if hadInterf then return "Houve interferência"
   else return $ show aliceK
+
+bb84run :: IO()
+bb84run = do
+  (alice, bob) <- bb84 10
+  printObservations alice
+  printObservations bob
+  str <- verifyInterference alice bob
+  putStrLn str
+
+
+bb84interfRun :: IO()
+bb84interfRun = do
+  (alice, trudy, bob) <- bb84Interf 10
+  printObservations alice
+  printObservations trudy
+  printObservations bob
+  str <- verifyInterference alice bob
+  putStrLn str

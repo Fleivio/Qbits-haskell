@@ -1,4 +1,4 @@
-module VirtualValues.Adaptor (Adaptor(..), ad_triple13, ad_triple23, ad_triple12, ad_triple3, ad_triple2, ad_triple1, ad_pair2, ad_pair1) where
+module VirtualValues.Adaptor (Adaptor(..), ad_triple13, ad_triple23, ad_triple12, ad_triple3, ad_triple2, ad_triple1, ad_triple, ad_pair2, ad_pair1) where
 
 -- Funcões que removem e colocam um valor quantico dentro de seu contexto
 -- Muito útil para isolarmos um valor de restante da estrutura
@@ -56,3 +56,8 @@ ad_triple23 = Adaptor {
     cmp = \((a2, a3), a1) -> (a1, a2, a3) 
 }
 
+ad_triple :: Adaptor ((a1,a2,a3), ()) (a1,(a2,a3))
+ad_triple = Adaptor {
+    dec = \(a1, (a2, a3)) -> ((a1,a2,a3), ()),
+    cmp = \((a1, a2, a3), ()) -> (a1,(a2,a3))
+}

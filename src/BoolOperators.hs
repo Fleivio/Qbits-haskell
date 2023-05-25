@@ -1,7 +1,7 @@
 module BoolOperators (xGate, yGate, zGate, hGate, cnot, toffoli, idGate,
  entangle,
  bra_0_ket, bra_1_ket, bra_phi_m_ket, bra_phi_p_ket, bra_psi_p_ket, bra_psi_m_ket, observeAtBasis, vGate, vtGate, toffoli',
- ObsBasis(..), deutsch) where
+ ObsBasis(..)) where
 
 import Basic.Operators
 import Basic.QuantumValue
@@ -85,20 +85,20 @@ toffoli' triple =
         cv = cqop id vGate
         cvt = cqop id vtGate
 
-deutsch :: (Bool -> Bool) -> IO()
-deutsch f = 
-    do 
-        inpr <- mkQR (bra_0_ket &* bra_1_ket)
-        let both = virtFromR inpr
-            top = virtFromV both ad_pair1
-            bot = virtFromV both ad_pair2
-            uf = cqop f xGate
-        app1 hGate top
-        app1 hGate bot 
-        app1 uf both
-        app1 hGate top
-        topV <- observeVV top
-        putStr (if topV then "Balanced" else "Constant")
+-- deutsch :: (Bool -> Bool) -> IO()
+-- deutsch f = 
+--     do 
+--         inpr <- mkQR (bra_0_ket &* bra_1_ket)
+--         let both = virtFromR inpr
+--             top = virtFromV both ad_pair1
+--             bot = virtFromV both ad_pair2
+--             uf = cqop f xGate
+--         app1 hGate top
+--         app1 hGate bot 
+--         app1 uf both
+--         app1 hGate top
+--         topV <- observeVV top
+--         putStr (if topV then "Balanced" else "Constant")
 
 
 -- Constants

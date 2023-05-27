@@ -100,6 +100,18 @@ deutsch f =
         topV <- observeVV top
         putStr (if topV then "Balanced" else "Constant")
 
+adder :: QV Bool -> QV Bool -> QV Bool -> IO()
+adder inc x y = 
+    let cout = bra_0_ket
+        qval = x &* y &* inc &* cout 
+    in do 
+        r <- mkQR qval
+        let v = virtFromV (virtFromR r) ad_quad
+            vxyo = virtFromV v ad_quad124
+            vxy = virtFromV v ad_quad12
+            vyio = virtFromV v ad_quad234
+            vyi = virtFromV v ad_quad23
+        app toffoli vxyo
 
 -- Constants
 

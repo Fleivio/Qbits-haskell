@@ -1,7 +1,7 @@
 module BoolOperators (xGate, yGate, zGate, hGate, cnot, toffoli, idGate,
  entangle,
  bra_0_ket, bra_1_ket, bra_phi_m_ket, bra_phi_p_ket, bra_psi_p_ket, bra_psi_m_ket, observeAtBasis, vGate, vtGate, toffoli',
- ObsBasis(..), deutsch) where
+ ObsBasis(..), deutsch, adder) where
 
 import Basic.Operators
 import Basic.QuantumValue
@@ -67,7 +67,7 @@ observeAtBasis X qr =
         qrApplyOp hGate qr
         return a
 
-toffoli' :: (Basis na, Basis u) => Virt (Bool, Bool, Bool) na u -> IO()
+toffoli' :: (Basis na, Basis u) => Virt ((Bool, Bool), Bool) na u -> IO()
 toffoli' triple = 
     do
         app1 hGate b
@@ -101,17 +101,24 @@ deutsch f =
         putStr (if topV then "Balanced" else "Constant")
 
 adder :: QV Bool -> QV Bool -> QV Bool -> IO()
-adder inc x y = 
-    let cout = bra_0_ket
-        qval = x &* y &* inc &* cout 
+adder inc x y =
+    let outc = bra_0_ket
+        vals = x &* y &* inc &* outc 
     in do 
-        r <- mkQR qval
-        let v = virtFromV (virtFromR r) ad_quad
+        r <- mkQR vals
+        let v = virtFromR r
             vxyo = virtFromV v ad_quad124
             vxy = virtFromV v ad_quad12
             vyio = virtFromV v ad_quad234
             vyi = virtFromV v ad_quad23
-        app toffoli vxyo
+            vio = virtFromV v ad_quad34
+        app1 toffoli vxyo
+        app1 cnot vxy
+        app1 toffoli vyio
+        app1 cnot vyi
+        app1 cnot vxy
+        (sumR, carryOut) <- observeVV vio
+        print (sumR, carryOut)
 
 -- Constants
 

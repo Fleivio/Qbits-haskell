@@ -15,5 +15,5 @@ instance (Basis a, Basis b) => Basis (a, b) where
 instance Basis () where
   basis = [()]
 
-instance (Basis a, Basis b, Basis c) => Basis (a,b,c)  where
-  basis = [(a,b,c) | a <- basis, b <- basis, c <-basis]
+-- instance (Basis a, Basis b, Basis c) => Basis (a,b,c)  where
+--   basis = [(a,b,c) | a <- basis, b <- basis, c <-basis]

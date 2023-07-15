@@ -1,7 +1,7 @@
 module BoolOperators (xGate, yGate, zGate, hGate, cnot, toffoli, idGate,
  entangle,
  bra_0_ket, bra_1_ket, bra_phi_m_ket, bra_phi_p_ket, bra_psi_p_ket, bra_psi_m_ket, observeAtBasis, vGate, vtGate, toffoli',
- ObsBasis(..), deutsch, adder) where
+ ObsBasis(..), deutsch, adder, adderRef) where
 
 import Quantum.Operators
 import Quantum.Value
@@ -13,6 +13,9 @@ import Virtual.Adaptor
 
 data ObsBasis = X | Z deriving (Show, Eq)
 
+
+boolToQv :: Bool -> QV Bool
+boolToQv b = mkQV [(b, 1)]
 
 xGate :: Qop Bool Bool
 xGate = qop [((False, True), 1),
@@ -98,10 +101,10 @@ deutsch f =
         topV <- observeVV top
         putStr (if topV then "Balanced" else "Constant")
 
-adder :: QV Bool -> QV Bool -> QV Bool -> IO()
+adder :: QV Bool -> QV Bool -> QV Bool -> IO (QV Bool, QV Bool)
 adder inc x y =
-    let outc = bra_0_ket
-        vals = x &* y &* inc &* outc 
+    let outc = bra_0_ket                -- carry out
+        vals = x &* y &* inc &* outc    -- (x, y, inc, out)
     in do 
         r <- mkQR vals
         let v = virtFromR r
@@ -118,9 +121,17 @@ adder inc x y =
         (sumR, carryOut) <- observeVV vio
         putStrLn $ qvToString x ++ " +. " ++ qvToString y ++ " +. " ++ qvToString inc
         putStrLn $ "Sum = " ++ show sumR ++ "\nCarry = " ++ show carryOut
+        return (boolToQv carryOut, boolToQv sumR)
 
-
-
+adderRef :: QR Bool -> QR Bool -> QR Bool -> QR Bool -> QR Bool -> IO()
+adderRef (QR cin') (QR x') (QR y') (QR cout') (QR s') = do
+    cin <- readIORef cin'
+    x   <- readIORef x'
+    y   <- readIORef y'
+    (cout, s) <- adder cin x y
+    writeIORef s' s
+    writeIORef cout' cout
+    
 -- Constants
 
 bra_1_ket :: QV Bool

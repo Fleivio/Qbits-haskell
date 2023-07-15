@@ -3,8 +3,7 @@ module BB84.BB84 (bb84run, bb84interfRun) where
 import BB84.Person
 import BB84.Generator
 import Control.Concurrent
-import Basic.Reference
-import Data.IORef (writeIORef)
+import Reference.Reference
 import BoolOperators
 
 genQbits :: PersonRef -> Chan (QR Bool) -> Int -> IO()

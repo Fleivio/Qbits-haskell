@@ -3,15 +3,13 @@ module BoolOperators (xGate, yGate, zGate, hGate, cnot, toffoli, idGate,
  bra_0_ket, bra_1_ket, bra_phi_m_ket, bra_phi_p_ket, bra_psi_p_ket, bra_psi_m_ket, observeAtBasis, vGate, vtGate, toffoli',
  ObsBasis(..), deutsch, adder) where
 
-import Basic.Operators
-import Basic.QuantumValue
-import Basic.Reference
-import Basic.Observation
-import VirtualValues.VirtualValue
-import VirtualValues.Adaptor
-import Basic.Basis
+import Quantum.Operators
+import Quantum.Value
+import Reference.Reference
+import Reference.Observation
+import Virtual.VirtualValue
+import Virtual.Adaptor
 
-import Data.Complex
 
 data ObsBasis = X | Z deriving (Show, Eq)
 
@@ -21,8 +19,8 @@ xGate = qop [((False, True), 1),
              ((True, False), 1)]
 
 yGate :: Qop Bool Bool
-yGate = qop [((False, True), 0 :+ (-1)),
-             ((True, False), 0 :+ 1)]
+yGate = qop [((False, True), 0 `addPA` (-1)),
+             ((True, False), 0 `addPA` 1)]
 
 zGate :: Qop Bool Bool
 zGate = qop [((False, False), 1),
@@ -36,11 +34,11 @@ hGate = qop [((False, False), 1),
 
 vGate :: Qop Bool Bool
 vGate = qop [((False, False), 1),
-            ((True, True), 0 :+ 1)]
+            ((True, True), 0 `addPA` 1)]
 
 vtGate :: Qop Bool Bool
 vtGate = qop [((False, False), 1),
-              ((True, True), 0 :+ (-1))]
+              ((True, True), 0 `addPA` (-1))]
 
 idGate :: Qop Bool Bool
 idGate = qop [((True, True), 1),
@@ -118,15 +116,18 @@ adder inc x y =
         app1 cnot vyi
         app1 cnot vxy
         (sumR, carryOut) <- observeVV vio
-        print (sumR, carryOut)
+        putStrLn $ qvToString x ++ " +. " ++ qvToString y ++ " +. " ++ qvToString inc
+        putStrLn $ "Sum = " ++ show sumR ++ "\nCarry = " ++ show carryOut
+
+
 
 -- Constants
 
 bra_1_ket :: QV Bool
-bra_1_ket = toQv [(True, 1)]
+bra_1_ket = mkQV [(True, 1)]
 
 bra_0_ket :: QV Bool
-bra_0_ket = toQv [(False, 1)]
+bra_0_ket = mkQV [(False, 1)]
 
 bra_phi_p_ket :: QV (Bool, Bool)
 bra_phi_p_ket = entangle bra_0_ket bra_0_ket

@@ -1,15 +1,12 @@
-module VirtualValues.VirtualValue (virtFromR, virtFromV, app, app1, Virt(..), observeVV) where
+module Virtual.VirtualValue (virtFromR, virtFromV, app, app1, Virt(..), observeVV) where
 
-import Basic.Reference ( QR(..) )
-import Basic.Basis ( Basis(..) )
-import Basic.Operators ( normalize, qApp, qop, Qop(..) )
+import Quantum.Value ( squareModulus, Basis(..), getProb, mkQV, addPA ) 
+import Quantum.Operators ( Qop(..), qop, qApp, normalize )
+import Reference.Reference ( QR(..) )
+import Reference.Observation ( observeV )
 import Data.IORef ( readIORef, writeIORef )
-import Basic.QuantumValue ( getProb, toQv )
-import Basic.ProbabilityAmplitude ( squareModulus )
-import Basic.Observation ( observeV )
-import Data.Complex ( Complex((:+)) )
 
-import VirtualValues.Adaptor ( Adaptor(..) )
+import Virtual.Adaptor ( Adaptor(..) )
 
 -- Valor virtual que recebe o contexto inteiro e uma funcao que filtra o qbit que temos interesse
 data Virt a na ua = Virt (QR ua) (Adaptor (a, na) ua)
@@ -55,9 +52,9 @@ observeVV :: (Basis a, Basis na, Basis ua) => Virt a na ua -> IO a
 observeVV (Virt (QR r) (Adaptor {dec = dec1, cmp = cmp1})) = 
     do 
         qVal <- readIORef r
-        let virtualProb a = sqrt. sum $ [squareModulus (getProb qVal (cmp1(a, na))) :+ 0 | na <- basis]
-            virtualQVal = toQv [ (a, virtualProb a) | a <- basis]
+        let virtualProb a = sqrt. sum $ [squareModulus (getProb qVal (cmp1(a, na))) `addPA` 0 | na <- basis]
+            virtualQVal = mkQV [ (a, virtualProb a) | a <- basis]
         observResult <- observeV virtualQVal
-        let nv = toQv [ (u, getProb qVal (cmp1 (observResult, na))) | u <- basis, let (a, na) = dec1 u, a == observResult ]
+        let nv = mkQV [ (u, getProb qVal (cmp1 (observResult, na))) | u <- basis, let (a, na) = dec1 u, a == observResult ]
         writeIORef r $ normalize nv
         return observResult

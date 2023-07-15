@@ -1,6 +1,6 @@
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 {-# HLINT ignore "Use camelCase" #-}
-module VirtualValues.Adaptor (Adaptor(..), ad_triple13, ad_triple23, ad_triple12, ad_triple3, ad_triple2, ad_triple1, ad_triple, ad_pair2, ad_pair1, ad_quad1, ad_quad2, ad_quad3, ad_quad4, ad_quad12, ad_quad13, ad_quad23, ad_quad123, ad_quad124, ad_quad134, ad_quad234, ad_quad, ad_quad34) where
+module Virtual.Adaptor (Adaptor(..), ad_triple13, ad_triple23, ad_triple12, ad_triple3, ad_triple2, ad_triple1, ad_triple, ad_pair2, ad_pair1, ad_quad1, ad_quad2, ad_quad3, ad_quad4, ad_quad12, ad_quad13, ad_quad23, ad_quad123, ad_quad124, ad_quad134, ad_quad234, ad_quad, ad_quad34) where
 
 -- Funcões que removem e colocam um valor quantico dentro de seu contexto
 -- Muito útil para isolarmos um valor de restante da estrutura

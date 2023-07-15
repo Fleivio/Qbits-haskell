@@ -1,9 +1,9 @@
 module BB84.Generator (genBitSet, genBasisSet, prepareQbits) where
 
-import Basic.Reference
+import Reference.Reference
 import System.Random
 import BoolOperators
-import Basic.Operators
+import Quantum.Operators
 import Control.Monad
 
 genBitSet :: Int -> IO [Bool]

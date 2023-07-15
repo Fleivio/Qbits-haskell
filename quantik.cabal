@@ -25,18 +25,18 @@ source-repository head
 
 library
   exposed-modules:
-      Basic.Basis
-      Basic.Observation
-      Basic.Operators
-      Basic.ProbabilityAmplitude
-      Basic.QuantumValue
-      Basic.Reference
       BB84.BB84
       BB84.Generator
       BB84.Person
       BoolOperators
-      VirtualValues.Adaptor
-      VirtualValues.VirtualValue
+      Quantum.Basis
+      Quantum.Operators
+      Quantum.ProbabilityAmplitude
+      Quantum.Value
+      Reference.Observation
+      Reference.Reference
+      Virtual.Adaptor
+      Virtual.VirtualValue
   other-modules:
       Paths_quantik
   hs-source-dirs:

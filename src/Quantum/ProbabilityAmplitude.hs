@@ -1,6 +1,6 @@
-module Basic.ProbabilityAmplitude (paToString, PA, squareModulus) where
+module Quantum.ProbabilityAmplitude (paToString, PA, squareModulus, addPA) where
 
-import Data.Complex
+import Data.Complex ( imagPart, magnitude, realPart, Complex(..) ) 
 import Text.Printf
 
 type PA = Complex Double 
@@ -15,3 +15,6 @@ paToString pa
 -- módulo ao quadrado
 squareModulus :: Complex Double -> Double
 squareModulus a = (**2) $ magnitude a
+
+addPA :: a -> a -> Complex a
+addPA = (:+)

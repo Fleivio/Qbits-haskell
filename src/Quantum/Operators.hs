@@ -1,12 +1,8 @@
-module Basic.Operators (qop, qApp, cqop, normalize, Qop(..)) where
+module Quantum.Operators (qop, qApp, cqop, normalize, Qop(..)) where
 
-import Basic.QuantumValue ( getProb, toQv, QV )
-import Basic.ProbabilityAmplitude ( squareModulus, PA )
-import Basic.Basis ( Basis(..) )
-
+import Quantum.Value
+    ( PA, squareModulus, Basis(..), QV, getProb, mkQV, addPA )
 import Data.Map as Map (Map, fromList, toList, map)
-
-import Data.Complex ( Complex((:+)) )
 import Prelude as P
 
 -- Operador, mapeia um valor a para um valor b, dada uma probabilidade
@@ -25,7 +21,7 @@ cqop enable (Qop u) = qop ( unchangeCase ++ changeCase )
 
 -- aplica uma operação a um valor quantico, retorna o resultado
 qApp :: (Basis a, Basis b) => Qop a b -> QV a -> QV b
-qApp (Qop mp) qval = toQv [ (b, probB b) | b <- basis ]
+qApp (Qop mp) qval = mkQV [ (b, probB b) | b <- basis ]
     where
         probB b = sum [ probToMap (a, b) * probOriginal a | a <- basis ]
         probOriginal = getProb qval
@@ -40,5 +36,5 @@ norm v = sqrt . sum $ probs
 normalize :: QV a -> QV a
 normalize qval = Map.map (c*) qval
     where
-        c = 1 / norm qval :+ 0
+        c = 1 / norm qval `addPA` 0
 

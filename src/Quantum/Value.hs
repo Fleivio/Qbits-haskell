@@ -7,7 +7,6 @@ import Data.Map as Map (Map, fromList, toList, findWithDefault)
 import Data.List (intercalate)
 
 -- tipo que mapeia um valor da base a uma probabilidade
--- quantum value
 type QV a = Map a PA
 
 -- retorna a probabilidade de um valor da base ser medido

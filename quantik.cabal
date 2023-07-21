@@ -29,6 +29,9 @@ library
       BB84.Generator
       BB84.Person
       BoolOperators
+      Lambda.Const
+      Lambda.Lambda
+      Lambda.Term
       Quantum.Basis
       Quantum.Operators
       Quantum.ProbabilityAmplitude

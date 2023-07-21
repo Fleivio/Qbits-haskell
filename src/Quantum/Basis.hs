@@ -11,6 +11,5 @@ instance Basis Bool where
 instance (Basis a, Basis b) => Basis (a, b) where
   basis = [(a, b) | a <- basis, b <- basis]
 
--- nao sei se sao necessarias
 instance Basis () where
   basis = [()]

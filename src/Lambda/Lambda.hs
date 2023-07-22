@@ -2,7 +2,6 @@ module Lambda.Lambda (Term(..), Const(..), LLT(..)) where
 import Lambda.Const
 import Lambda.Term
 
-import Debug.Trace
 
 data LLT = 
       Var Int
@@ -34,18 +33,6 @@ instance Term LLT where
     reductionRun (App (NonLinAbs t) (NonLinTerm v)) 
         = betaReduct v t                                                -- !b1
     reductionRun a = a
-
-    reduction t =
-        let t' = reductionRun t
-        in  if t' == t
-            then t
-            else reduction t'
-
-    reductionDebug t =
-        let t' = reductionRun t
-        in  if t' == t
-            then t
-            else trace (show t ++ " --> " ++ show t') (reductionDebug t')
 
     shift d = walk 0
         where walk c t = case t of

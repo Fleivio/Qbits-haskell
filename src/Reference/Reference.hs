@@ -4,10 +4,14 @@ import Quantum.Operators
 import Quantum.Value
 
 import Data.IORef
+import GHC.IO (unsafePerformIO)
 
 -- Referência a um valor quantico (ponteiro)
 -- quantum reference
-data QR a = QR(IORef (QV a))
+newtype QR a = QR(IORef (QV a))
+
+instance (Show a) => Show (QR a) where
+    show (QR ioref) = unsafePerformIO $ qrToString (QR ioref)
 
 -- retorna uma referencia ao valor QR
 mkQR :: QV a -> IO(QR a)

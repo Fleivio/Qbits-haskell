@@ -1,12 +1,7 @@
 module Lambda.Const (Const(..)) where
 
-data Const = Zero | One | H | X | Y | Z | Cnot deriving Eq
+-- import Quantum.Operators (Qop(..))
+-- import Reference.Reference (QR(..))
+-- import Quantum.Basis (Basis(..))
 
-instance Show Const where 
-    show Zero = "q0"
-    show One = "q1"
-    show H = "H"
-    show X = "X"
-    show Y = "Y"
-    show Z = "Z"
-    show Cnot = "Cnot"
+data Const = Zero | One | H | CNOT | X | Y | Z | S | T | I deriving (Eq, Show)

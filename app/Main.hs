@@ -38,7 +38,20 @@ import Lambda.BasicFunctions
 main :: IO ()
 main =  let a = reductionDebug $ NonLinAbs (Const Zero) `App` NonLinTerm (App (Const H) (Const Zero))
             b = reductionDebug $ App (App (NonLinAbs (NonLinAbs (App (Var 1) (Var 0)))) (NonLinTerm lId)) (NonLinTerm(NonLinTerm(Const Zero))) 
+            fix = reductionDebug $ App lFix $ NonLinAbs (Const Zero `App` Var 0)
         in do print a
               putStrLn "\n----\n"
               print b
+              putStrLn "\n----\n"
+              print fix
               return ()
+
+{-
+(fix !(t)) --> (λ!(0 !((fix !(0)))) !(t))
+(λ!(0 !((fix !(0)))) !(t)) --> (t !((fix !(t))))
+(t !((fix !(t))))
+
+(fix λ!(q0 0)) --> (λ!(0 !((fix !(0)))) λ!(q0 0))
+(λ!(0 !((fix !(0)))) λ!(q0 0))
+
+-}

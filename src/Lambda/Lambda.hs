@@ -2,7 +2,6 @@ module Lambda.Lambda (Term(..), Const(..), LLT(..)) where
 import Lambda.Const
 import Lambda.Term
 
-
 data LLT = 
       Var Int
     | Const Const
@@ -15,11 +14,10 @@ data LLT =
 instance Show LLT where 
     show (Var i) = show i
     show (App t1 t2) = "(" ++ show t1 ++ " " ++ show t2 ++ ")"
-    show (NonLinAbs t) = "/!" ++ show t
-    show (LinAbs t)    = "/" ++ show t
+    show (NonLinAbs t) = "λ!" ++ show t
+    show (LinAbs t)    = "λ" ++ show t
     show (Const c)     = show c
     show (NonLinTerm t) = "!(" ++ show t ++ ")"
-
 
 instance Term LLT where
     isValue (App _ _) = False
@@ -29,10 +27,10 @@ instance Term LLT where
         | not (isValue t1)       = App (reductionRun t1) t2  -- app 1    
         | not (isValue t2)       = App t1 (reductionRun t2)  -- app 2
     reductionRun (App (LinAbs t) v) 
-        | isValue v                            = betaReduct v t         -- beta
+        | isValue v              = betaReduct v t            -- beta
     reductionRun (App (NonLinAbs t) (NonLinTerm v)) 
-        = betaReduct v t                                                -- !b1
-    reductionRun a = a
+                                 = betaReduct v t            -- !beta
+    reductionRun a = a                                       -- tratar o caso quantico
 
     shift d = walk 0
         where walk c t = case t of

@@ -1,6 +1,6 @@
 module Quantum.Basis (Basis, basis) where
 
-class (Eq a, Ord a) => Basis a where
+class (Eq a, Ord a, Show a) => Basis a where
   basis :: [a]
 
 -- Base para o tipo bool

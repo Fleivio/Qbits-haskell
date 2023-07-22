@@ -1,5 +1,5 @@
 module Lambda.BasicFunctions (lId, lFalse, lTrue, lIf, lNot, lAnd, lOr, lZero, lOne, lSum,
-lSucc, lMult, lPow, lPred, lSub, lIsZro, lEqual, lPair, lLst, lFst) where
+lSucc, lMult, lPow, lPred, lSub, lIsZro, lEqual, lPair, lLst, lFst, lFix) where
 
 import Lambda.Lambda
 
@@ -140,7 +140,7 @@ lPair :: LLT
 lPair = bar (
         bar (
             bar (
-                App (App (Var 0) (Var 2)) (Var 1) 
+                App (App (Var 0) (Var 2)) (Var 1)
             )
         )
     )
@@ -154,3 +154,20 @@ lFst :: LLT
 lFst = bar (
         App (Var 0) lTrue
     )
+
+-- RECURSIVE 
+lFix :: LLT
+lFix = bar ( -- !u     1    
+            bar  -- ! f 0
+            (
+                Var 0 `App` NonLinTerm ( (Var 1 `App` NonLinTerm (Var 1)) `App` NonLinTerm (Var 0) )
+            )
+        )
+        `App` 
+        NonLinTerm (bar ( -- !u     1    
+            bar  -- ! f 0
+            (
+                Var 0 `App` NonLinTerm ( (Var 1 `App` NonLinTerm (Var 1)) `App` NonLinTerm (Var 0) )
+            )
+        ))
+

@@ -2,6 +2,8 @@ module Lambda.Lambda (Term(..), Const(..), LLT(..)) where
 import Lambda.Const
 import Lambda.Term
 
+import Debug.Trace
+
 data LLT = 
       Var Int
     | Const Const
@@ -24,23 +26,26 @@ instance Term LLT where
     isValue (App _ _) = False
     isValue _ = True
 
-    reduction (App t1 t2) 
-        | not (isValue t1)       = App (reduction t1) t2  -- app 1    
-        | not (isValue t2)       = App t1 (reduction t2)  -- app 2
-    reduction (App (LinAbs t) v) 
+    reductionRun (App t1 t2) 
+        | not (isValue t1)       = App (reductionRun t1) t2  -- app 1    
+        | not (isValue t2)       = App t1 (reductionRun t2)  -- app 2
+    reductionRun (App (LinAbs t) v) 
         | isValue v                            = betaReduct v t         -- beta
-    reduction (App (NonLinAbs t) (NonLinTerm v)) 
+    reductionRun (App (NonLinAbs t) (NonLinTerm v)) 
         = betaReduct v t                                                -- !b1
-        -- b2 nao tratado
-    reduction a = a
+    reductionRun a = a
 
-    reductionPrint t = do
-        let t' = reduction t
-        if t' == t
-            then return t
-            else do
-                putStrLn $ show t ++ " --> " ++ show t'
-                reductionPrint t'
+    reduction t =
+        let t' = reductionRun t
+        in  if t' == t
+            then t
+            else reduction t'
+
+    reductionDebug t =
+        let t' = reductionRun t
+        in  if t' == t
+            then t
+            else trace (show t ++ " --> " ++ show t') (reductionDebug t')
 
     shift d = walk 0
         where walk c t = case t of

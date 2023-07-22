@@ -1,4 +1,5 @@
 module Main (main) where
+{-# LANGUAGE BangPatterns #-}
 
 import Lambda.Lambda
 import Lambda.BasicFunctions
@@ -35,8 +36,9 @@ import Lambda.BasicFunctions
 
 
 main :: IO ()
-main = do
-    _ <- reductionPrint $ NonLinAbs (Const Zero) `App` NonLinTerm (App (Const H) (Const Zero))
-    putStrLn "\n"
-    _ <- reductionPrint $ App (App (NonLinAbs (NonLinAbs (App (Var 1) (Var 0)))) (NonLinTerm lId)) (NonLinTerm(NonLinTerm(Const Zero))) 
-    putStrLn "\n"
+main =  let a = reductionDebug $ NonLinAbs (Const Zero) `App` NonLinTerm (App (Const H) (Const Zero))
+            b = reductionDebug $ App (App (NonLinAbs (NonLinAbs (App (Var 1) (Var 0)))) (NonLinTerm lId)) (NonLinTerm(NonLinTerm(Const Zero))) 
+        in do print a
+              putStrLn "\n----\n"
+              print b
+              return ()

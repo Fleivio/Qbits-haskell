@@ -25,8 +25,8 @@ instance Term LLT where
     isValue _ = True
 
     reduction (App t1 t2) 
-        | not (isValue t1) && not (isValue t2) = App (reduction t1) t2  -- app 1    
-        | isValue t1 && not (isValue t2)       = App t1 (reduction t2)  -- app 2
+        | not (isValue t1)       = App (reduction t1) t2  -- app 1    
+        | not (isValue t2)       = App t1 (reduction t2)  -- app 2
     reduction (App (LinAbs t) v) 
         | isValue v                            = betaReduct v t         -- beta
     reduction (App (NonLinAbs t) (NonLinTerm v)) 
@@ -39,7 +39,7 @@ instance Term LLT where
         if t' == t
             then return t
             else do
-                putStrLn $ show t ++ " -> " ++ show t'
+                putStrLn $ show t ++ " --> " ++ show t'
                 reductionPrint t'
 
     shift d = walk 0

@@ -1,6 +1,7 @@
 module Main (main) where
 
 import Lambda.Lambda
+import Lambda.BasicFunctions
 
 -- y :: IO (QR Bool)
 -- y = mkQR $ mkQV [(True, 1)]
@@ -35,5 +36,7 @@ import Lambda.Lambda
 
 main :: IO ()
 main = do
-    r <- reductionPrint $ (NonLinAbs (App (LinAbs (Var 0)) (Const Zero))) `App` NonLinTerm (App (Const H) (Const Zero))
-    print r
+    _ <- reductionPrint $ NonLinAbs (Const Zero) `App` NonLinTerm (App (Const H) (Const Zero))
+    putStrLn "\n"
+    _ <- reductionPrint $ App (App (NonLinAbs (NonLinAbs (App (Var 1) (Var 0)))) (NonLinTerm lId)) (NonLinTerm(NonLinTerm(Const Zero))) 
+    putStrLn "\n"

@@ -1,26 +1,22 @@
-module Lambda.Lambda (Term(..), LLT(..), adaptLLT) where
+module Lambda.Lambda (Term(..), LLT(..)) where
 
 import Lambda.Term
 import Quantum.Operators (Qop(..))
-import Virtual.VirtualValue
+import Reference.Reference
 import Quantum.Basis
 import GHC.IO
-import Virtual.Adaptor
 
-data LLT a b c = 
+data LLT a = 
       Var Int
-    | LinAbs (LLT a b c)
-    | NonLinAbs (LLT a b c)
-    | NonLinTerm (LLT a b c) 
-    | App (LLT a b c) (LLT a b c)
+    | LinAbs (LLT a)
+    | NonLinAbs (LLT a)
+    | NonLinTerm (LLT a) 
+    | App (LLT a) (LLT a)
     | LQop (Qop a a)
-    | LQval (Virt a b c)
+    | LQval (QR a)
 
-adaptLLT :: (Basis a, Basis na, Basis u) => LLT a na u -> Adaptor (a1, a2) a -> LLT a1 (a2, na) u
-adaptLLT (LQval v) a = LQval (virtFromV v a)
-adaptLLT a b = adaptLLT (reductionDebug a) b
 
-instance (Basis a, Basis b, Basis c) => Eq (LLT a b c) where
+instance (Basis a) => Eq (LLT a) where
     Var i == Var j = i == j
     LinAbs t1 == LinAbs t2 = t1 == t2
     NonLinAbs t1 == NonLinAbs t2 = t1 == t2
@@ -30,7 +26,7 @@ instance (Basis a, Basis b, Basis c) => Eq (LLT a b c) where
     LQval _ == LQval _ = True
     _ == _ = False
 
-instance (Basis a, Basis b, Basis c) => Show (LLT a b c) where 
+instance (Basis a) => Show (LLT a) where 
     show (Var i) = show i
     show (App t1 t2) = "(" ++ show t1 ++ " " ++ show t2 ++ ")"
     show (NonLinAbs t) = "λ!" ++ show t
@@ -39,7 +35,7 @@ instance (Basis a, Basis b, Basis c) => Show (LLT a b c) where
     show (LQop q) = show q 
     show (LQval v) = show v
 
-instance (Basis a, Basis b, Basis c) => Term (LLT a b c) where
+instance (Basis a) => Term (LLT a) where
     isValue (App _ _) = False
     isValue _ = True
 
@@ -52,7 +48,7 @@ instance (Basis a, Basis b, Basis c) => Term (LLT a b c) where
                                  = betaReduct v t            -- !beta
     reductionRun (App (LQop q) (LQval v))
          = unsafePerformIO (
-            do  _ <- app1 q v
+            do  _ <- qrApplyOp q v
                 return $ LQval v                             -- qop 
             ) 
     reductionRun a = a                                       -- id

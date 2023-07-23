@@ -11,18 +11,13 @@ import Quantum.Value
 import Lambda.Lambda
 import Virtual.Adaptor
 
-term2 :: LLT Bool (Bool, ()) (Bool, Bool)
-term2 = adaptLLT (LQop cnot `App` LQval (virtFromR $ unsafePerformIO (mkQR (mkQV [((False, True), 1)]) ))) ad_pair1
+extraId = NonLinAbs (lId `App` NonLinTerm (LQval ref0))
 
-term :: LLT Bool () Bool
-term = LQop xGate `App` (LQop hGate `App` ( NonLinAbs (lId `App` NonLinTerm (Var 0))  
-                                    `App` NonLinTerm ( LQval virtOne )))
+term = (LQop hGate `App`  ( LQval ref0 ))
 
 
 main :: IO ()
 main =  let a = reductionDebug term
-            b = reductionDebug term2
         in do print a
               putStrLn "----------------"
-              print b
               return ()

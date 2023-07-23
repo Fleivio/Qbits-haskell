@@ -24,7 +24,7 @@ cqop enable (Qop u _) = qop ( unchangeCase ++ changeCase )
 
 -- aplica uma operação a um valor quantico, retorna o resultado
 qApp :: (Basis a, Basis b) => Qop a b -> QV a -> QV b
-qApp (Qop mp _) qval = mkQV [ (b, probB b) | b <- basis ]
+qApp (Qop mp _) qval = normalize $ mkQV [ (b, probB b) | b <- basis ]
     where
         probB b = sum [ probToMap (a, b) * probOriginal a | a <- basis ]
         probOriginal = getProb qval

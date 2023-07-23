@@ -1,7 +1,7 @@
 module BoolOperators (xGate, yGate, zGate, hGate, cnot, toffoli, idGate,
  entangle,
  bra_0_ket, bra_1_ket, bra_phi_m_ket, bra_phi_p_ket, bra_psi_p_ket, bra_psi_m_ket, observeAtBasis, vGate, vtGate, toffoli',
- ObsBasis(..), deutsch, adder, adderRef) where
+ ObsBasis(..), deutsch, adder, adderRef, ref1, ref0) where
 
 import Quantum.Operators
 import Quantum.Value
@@ -9,6 +9,7 @@ import Reference.Reference
 import Reference.Observation
 import Virtual.VirtualValue
 import Virtual.Adaptor
+import GHC.IO (unsafePerformIO)
 
 
 data ObsBasis = X | Z deriving (Show, Eq)
@@ -76,7 +77,7 @@ observeAtBasis X qr =
         return a
 
 toffoli' :: (Basis na, Basis u) => Virt ((Bool, Bool), Bool) na u -> IO()
-toffoli' triple = 
+toffoli' triple =
     do
         app1 hGate b
         app1 cv mb
@@ -94,15 +95,15 @@ toffoli' triple =
         cvt = cqop id vtGate "Cvt"
 
 deutsch :: (Bool -> Bool) -> IO()
-deutsch f = 
-    do 
+deutsch f =
+    do
         inpr <- mkQR (bra_0_ket &* bra_1_ket)
         let both = virtFromR inpr
             top = virtFromV both ad_pair1
             bot = virtFromV both ad_pair2
             uf = cqop f xGate "Uf"
         app1 hGate top
-        app1 hGate bot 
+        app1 hGate bot
         app1 uf both
         app1 hGate top
         topV <- observeVV top
@@ -112,7 +113,7 @@ adder :: QV Bool -> QV Bool -> QV Bool -> IO (QV Bool, QV Bool)
 adder inc x y =
     let outc = bra_0_ket                -- carry out
         vals = x &* y &* inc &* outc    -- (x, y, inc, out)
-    in do 
+    in do
         r <- mkQR vals
         let v = virtFromR r
             vxyo = virtFromV v ad_quad124
@@ -138,8 +139,14 @@ adderRef (QR cin') (QR x') (QR y') (QR cout') (QR s') = do
     (cout, s) <- adder cin x y
     writeIORef s' s
     writeIORef cout' cout
-    
+
 -- Constants
+
+ref1 :: QR Bool
+ref1 = unsafePerformIO $ mkQR (bra_1_ket)
+
+ref0 :: QR Bool
+ref0 = unsafePerformIO $ mkQR (bra_0_ket)
 
 bra_1_ket :: QV Bool
 bra_1_ket = mkQV [(True, 1)]

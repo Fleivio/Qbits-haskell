@@ -1,12 +1,11 @@
-module Lambda.Lambda (Term(..), LLT(..), CCont(..)) where
+module Lambda.Lambda (Term(..), LLT(..), adaptLLT) where
 
 import Lambda.Term
 import Quantum.Operators (Qop(..))
 import Virtual.VirtualValue
 import Quantum.Basis
 import GHC.IO
-
-data CCont = A | B deriving (Eq, Show)
+import Virtual.Adaptor
 
 data LLT a b c = 
       Var Int
@@ -16,8 +15,10 @@ data LLT a b c =
     | App (LLT a b c) (LLT a b c)
     | LQop (Qop a a)
     | LQval (Virt a b c)
-    | Const CCont
--- todo: ter o tipo adaptor para transitar entre diferentes bases da expressão
+
+adaptLLT :: (Basis a, Basis na, Basis u) => LLT a na u -> Adaptor (a1, a2) a -> LLT a1 (a2, na) u
+adaptLLT (LQval v) a = LQval (virtFromV v a)
+adaptLLT a b = adaptLLT (reductionDebug a) b
 
 instance (Basis a, Basis b, Basis c) => Eq (LLT a b c) where
     Var i == Var j = i == j
@@ -25,7 +26,6 @@ instance (Basis a, Basis b, Basis c) => Eq (LLT a b c) where
     NonLinAbs t1 == NonLinAbs t2 = t1 == t2
     NonLinTerm t1 == NonLinTerm t2 = t1 == t2
     App t1 t2 == App t3 t4 = t1 == t3 && t2 == t4
-    Const c1 == Const c2 = c1 == c2
     LQop _ == LQop _ = True
     LQval _ == LQval _ = True
     _ == _ = False
@@ -38,8 +38,6 @@ instance (Basis a, Basis b, Basis c) => Show (LLT a b c) where
     show (NonLinTerm t) = "!(" ++ show t ++ ")"
     show (LQop q) = show q 
     show (LQval v) = show v
-    show (Const A) = "A"
-    show (Const B) = "B"
 
 instance (Basis a, Basis b, Basis c) => Term (LLT a b c) where
     isValue (App _ _) = False

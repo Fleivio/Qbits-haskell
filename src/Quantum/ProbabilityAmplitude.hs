@@ -14,7 +14,7 @@ paToString pa
 
 -- módulo ao quadrado
 squareModulus :: Complex Double -> Double
-squareModulus a = (**2) $ magnitude a
+squareModulus = (**2) . magnitude
 
 addPA :: a -> a -> Complex a
 addPA = (:+)

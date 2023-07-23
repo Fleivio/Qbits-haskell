@@ -17,7 +17,7 @@ data LLT a b c =
     | LQop (Qop a a)
     | LQval (Virt a b c)
     | Const CCont
--- ideia: ter o tipo adaptor para transitar entre diferentes bases da expressão
+-- todo: ter o tipo adaptor para transitar entre diferentes bases da expressão
 
 instance (Basis a, Basis b, Basis c) => Eq (LLT a b c) where
     Var i == Var j = i == j
@@ -55,9 +55,9 @@ instance (Basis a, Basis b, Basis c) => Term (LLT a b c) where
     reductionRun (App (LQop q) (LQval v))
          = unsafePerformIO (
             do  _ <- app1 q v
-                return $ LQval v                -- qop 
+                return $ LQval v                             -- qop 
             ) 
-    reductionRun a = a                                          -- id
+    reductionRun a = a                                       -- id
 
     shift d = walk 0
         where walk c t = case t of

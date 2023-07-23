@@ -8,7 +8,7 @@ import Virtual.VirtualValue
 
 
 term :: LLT Bool () Bool
-term = (LQop hGate) `App` ( LQval virtOne )
+term = (LQop hGate) `App` ((LQop hGate) `App` (  (NonLinAbs ((lId) `App` NonLinTerm (Var 0)))  `App` ( NonLinTerm ( LQval virtOne ))))
 
 main :: IO ()
 main =  let a = reductionDebug term

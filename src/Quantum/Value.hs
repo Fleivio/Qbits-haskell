@@ -25,4 +25,6 @@ mkQV = fromList . filterZeros
 
 -- converte para uma string
 qvToString :: (Show a) => QV a -> String
-qvToString qvalue = intercalate " + " [paToString pa ++ " ⋅ |" ++ show a ++ "⟩" | (a, pa) <- toList qvalue]
+qvToString qvalue = intercalate " + " [paString pa ++ "|" ++ show a ++ "⟩" | (a, pa) <- toList qvalue]
+  where paString p = if p == 1 then "" else show p ++ "⋅"
+  

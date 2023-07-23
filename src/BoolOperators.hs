@@ -20,38 +20,45 @@ boolToQv b = mkQV [(b, 1)]
 xGate :: Qop Bool Bool
 xGate = qop [((False, True), 1),
              ((True, False), 1)]
+            "X"
 
 yGate :: Qop Bool Bool
 yGate = qop [((False, True), 0 `addPA` (-1)),
              ((True, False), 0 `addPA` 1)]
+            "Y"
 
 zGate :: Qop Bool Bool
 zGate = qop [((False, False), 1),
              ((True, True), -1)]
+            "Z"
 
 hGate :: Qop Bool Bool
 hGate = qop [((False, False), 1),
              ((False, True), 1),
              ((True, False), 1),
              ((True, True), -1) ]
+            "H"
 
 vGate :: Qop Bool Bool
 vGate = qop [((False, False), 1),
             ((True, True), 0 `addPA` 1)]
+            "V"
 
 vtGate :: Qop Bool Bool
 vtGate = qop [((False, False), 1),
               ((True, True), 0 `addPA` (-1))]
+            "Vt"
 
 idGate :: Qop Bool Bool
 idGate = qop [((True, True), 1),
               ((False, False), 1)]
+            "Id"
 
 cnot :: Qop (Bool, Bool) (Bool, Bool)
-cnot = cqop id xGate
+cnot = cqop id xGate "Cnot"
 
 toffoli :: Qop ((Bool, Bool), Bool) ((Bool, Bool), Bool)
-toffoli = cqop (uncurry (&&)) xGate
+toffoli = cqop (uncurry (&&)) xGate "Toffoli"
 
 entangle :: QV Bool -> QV Bool -> QV (Bool, Bool)
 entangle q1 q2 = qApp cnot (qApp hGate q1 &* q2)
@@ -83,8 +90,8 @@ toffoli' triple =
         mb = virtFromV triple ad_triple23
         tm = virtFromV triple ad_triple12
         tb = virtFromV triple ad_triple13
-        cv = cqop id vGate
-        cvt = cqop id vtGate
+        cv = cqop id vGate "Cv"
+        cvt = cqop id vtGate "Cvt"
 
 deutsch :: (Bool -> Bool) -> IO()
 deutsch f = 
@@ -93,7 +100,7 @@ deutsch f =
         let both = virtFromR inpr
             top = virtFromV both ad_pair1
             bot = virtFromV both ad_pair2
-            uf = cqop f xGate
+            uf = cqop f xGate "Uf"
         app1 hGate top
         app1 hGate bot 
         app1 uf both

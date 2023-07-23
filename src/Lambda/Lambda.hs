@@ -1,25 +1,47 @@
-module Lambda.Lambda (Term(..), Const(..), LLT(..)) where
-import Lambda.Const
+module Lambda.Lambda (Term(..), LLT(..), CCont(..)) where
+
 import Lambda.Term
+import Quantum.Operators (Qop(..))
+import Virtual.VirtualValue
+import Quantum.Basis
+import GHC.IO
 
-data LLT = 
+data CCont = A | B deriving (Eq, Show)
+
+data LLT a b c = 
       Var Int
-    | Const Const
-    | LinAbs LLT
-    | NonLinAbs LLT
-    | NonLinTerm LLT 
-    | App LLT LLT
-    deriving Eq
+    | LinAbs (LLT a b c)
+    | NonLinAbs (LLT a b c)
+    | NonLinTerm (LLT a b c) 
+    | App (LLT a b c) (LLT a b c)
+    | LQop (Qop a a)
+    | LQval (Virt a b c)
+    | Const CCont
+-- ideia: ter o tipo adaptor para transitar entre diferentes bases da expressão
 
-instance Show LLT where 
+instance (Eq c) => Eq (LLT a b c) where
+    Var i == Var j = i == j
+    LinAbs t1 == LinAbs t2 = t1 == t2
+    NonLinAbs t1 == NonLinAbs t2 = t1 == t2
+    NonLinTerm t1 == NonLinTerm t2 = t1 == t2
+    App t1 t2 == App t3 t4 = t1 == t3 && t2 == t4
+    Const c1 == Const c2 = c1 == c2
+    LQop _ == LQop _ = True
+    LQval _ == LQval _ = True
+    _ == _ = False
+
+instance (Show a, Show c) => Show (LLT a b c) where 
     show (Var i) = show i
     show (App t1 t2) = "(" ++ show t1 ++ " " ++ show t2 ++ ")"
     show (NonLinAbs t) = "λ!" ++ show t
     show (LinAbs t)    = "λ" ++ show t
-    show (Const c)     = show c
     show (NonLinTerm t) = "!(" ++ show t ++ ")"
+    show (LQop q) = show q 
+    show (LQval v) = show v
+    show (Const A) = "A"
+    show (Const B) = "B"
 
-instance Term LLT where
+instance (Basis a, Basis b, Basis c) => Term (LLT a b c) where
     isValue (App _ _) = False
     isValue _ = True
 
@@ -30,7 +52,12 @@ instance Term LLT where
         | isValue v              = betaReduct v t            -- beta
     reductionRun (App (NonLinAbs t) (NonLinTerm v)) 
                                  = betaReduct v t            -- !beta
-    reductionRun a = a                                       -- tratar o caso quantico
+    reductionRun (App (LQop q) (LQval v))
+         = unsafePerformIO (
+            do  _ <- app1 q v
+                return $ LQval v                -- qop 
+            ) 
+    reductionRun a = a                                          -- id
 
     shift d = walk 0
         where walk c t = case t of

@@ -1,15 +1,26 @@
-module Virtual.VirtualValue (virtFromR, virtFromV, app, app1, Virt(..), observeVV) where
+module Virtual.VirtualValue (virtFromR, virtFromV, app, app1, Virt(..), observeVV, virtOne, virtZero) where
 
 import Quantum.Value ( squareModulus, Basis(..), getProb, mkQV, addPA ) 
 import Quantum.Operators ( Qop(..), qop, qApp, normalize )
-import Reference.Reference ( QR(..) )
+import Reference.Reference ( QR(..) , mkQR)
 import Reference.Observation ( observeV )
 import Data.IORef ( readIORef, writeIORef )
 
 import Virtual.Adaptor ( Adaptor(..) )
+import GHC.IO (unsafePerformIO)
 
 -- Valor virtual que recebe o contexto inteiro e uma funcao que filtra o qbit que temos interesse
 data Virt a na ua = Virt (QR ua) (Adaptor (a, na) ua)
+
+instance (Show ua) => Show (Virt a na ua) where
+    show (Virt ref _ ) = show ref
+
+virtOne :: Virt Bool () Bool
+virtOne = virtFromR $ unsafePerformIO $ mkQR (mkQV [(True, 1)])
+
+virtZero :: Virt Bool () Bool
+virtZero = virtFromR $ unsafePerformIO $ mkQR (mkQV [(False, 1)]) 
+
 
 -- Cria um valor virtual a partir de uma unica referencia
 virtFromR :: QR a -> Virt a () a
@@ -30,7 +41,7 @@ virtFromV (Virt r gAdaptor) lAdaptor = Virt r composedAdaptor
                         in (a1, (a2, na))
 
 app :: (Basis a, Basis b, Basis nab, Basis ua, Basis ub) => Qop a b -> Virt a nab ua -> Virt b nab ub -> IO()
-app (Qop f)
+app (Qop f _)
     (Virt (QR ra) (Adaptor {dec = deca, cmp = _}))
     (Virt (QR rb) (Adaptor {dec = decb, cmp = _})) =
     do 
@@ -41,7 +52,7 @@ app (Qop f)
     where gf = qop [ ( (ua, ub), getProb f (a, b) ) | (ua, ub) <- basis,
                     let (a, na) = deca ua
                         (b, nb) = decb ub,
-                    na == nb ]
+                    na == nb ] "combined"
 
 app1 :: (Basis a, Basis na, Basis ua) => Qop a a -> Virt a na ua -> IO ()
 app1 f v = app f v v

@@ -19,7 +19,7 @@ data LLT a b c =
     | Const CCont
 -- ideia: ter o tipo adaptor para transitar entre diferentes bases da expressão
 
-instance (Eq c) => Eq (LLT a b c) where
+instance (Basis a, Basis b, Basis c) => Eq (LLT a b c) where
     Var i == Var j = i == j
     LinAbs t1 == LinAbs t2 = t1 == t2
     NonLinAbs t1 == NonLinAbs t2 = t1 == t2
@@ -30,7 +30,7 @@ instance (Eq c) => Eq (LLT a b c) where
     LQval _ == LQval _ = True
     _ == _ = False
 
-instance (Show a, Show c) => Show (LLT a b c) where 
+instance (Basis a, Basis b, Basis c) => Show (LLT a b c) where 
     show (Var i) = show i
     show (App t1 t2) = "(" ++ show t1 ++ " " ++ show t2 ++ ")"
     show (NonLinAbs t) = "λ!" ++ show t

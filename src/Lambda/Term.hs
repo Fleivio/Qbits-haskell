@@ -1,7 +1,7 @@
 {-# LANGUAGE DefaultSignatures #-}
 module Lambda.Term ( Term(..) ) where
 
-import qualified Debug.Trace as Debug
+import GHC.IO
 
 class (Eq a, Show a) => Term a where
     isValue :: a -> Bool
@@ -14,11 +14,17 @@ class (Eq a, Show a) => Term a where
 
     default reductionDebug :: a -> a
     reductionDebug t =
-        let t' = reductionRun t
+        let t' = unsafePerformIO (
+                do putStr (show t ++ " >>> " )
+                   let reduct = reductionRun t
+                   print reduct
+                   return reduct
+                )
         in  if t' == t
             then t
-            else Debug.trace (show t ++ " --> " ++ show t') (reductionDebug t')
-    
+            else reductionDebug t'
+                
+                
     default reduction :: a -> a 
     reduction t =
         let t' = reductionRun t

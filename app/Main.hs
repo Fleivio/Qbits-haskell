@@ -13,7 +13,7 @@ import Virtual.Adaptor
 
 extraId = NonLinAbs (lId `App` NonLinTerm (LQval ref0))
 
-term = (LQop hGate `App`  ( LQval ref0 ))
+term = Read (LQop hGate `App` ( LQval ref0 ))
 
 
 main :: IO ()

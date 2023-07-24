@@ -5,6 +5,7 @@ import Quantum.Operators (Qop(..))
 import Reference.Reference
 import Quantum.Basis
 import GHC.IO
+import Reference.Observation
 
 data LLT a = 
       Var Int
@@ -14,6 +15,7 @@ data LLT a =
     | App (LLT a) (LLT a)
     | LQop (Qop a a)
     | LQval (QR a)
+    | Read (LLT a)
 
 
 instance (Basis a) => Eq (LLT a) where
@@ -32,6 +34,7 @@ instance (Basis a) => Show (LLT a) where
     show (NonLinAbs t) = "λ!" ++ show t
     show (LinAbs t)    = "λ" ++ show t
     show (NonLinTerm t) = "!(" ++ show t ++ ")"
+    show (Read t) = "read " ++ show t
     show (LQop q) = show q 
     show (LQval v) = show v
 
@@ -51,6 +54,11 @@ instance (Basis a) => Term (LLT a) where
             do  _ <- qrApplyOp q v
                 return $ LQval v                             -- qop 
             ) 
+    reductionRun (Read (LQval ref)) = unsafePerformIO (
+            do _ <- observeR ref
+               return (LQval ref)
+        )    
+    reductionRun (Read t) = Read $ reductionRun t 
     reductionRun a = a                                       -- id
 
     shift d = walk 0

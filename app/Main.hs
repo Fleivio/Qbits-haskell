@@ -18,13 +18,11 @@ term = Read $ LGate xGate `App` (LGate hGate `App` ( NonLinAbs (lId `App` NonLin
                                     `App` NonLinTerm ( LValue virtOne )))
 
 
-
+term3 = Read $ LGate hGate `App` (adaptLLT (LValue (virtFromR $ unsafePerformIO (mkQR ( bra_1_ket &* bra_1_ket &* bra_0_ket )))) ad_triple1)
 
 
 main :: IO ()
-main =  let a = reductionDebug term
-            b = reductionDebug term2
-        in do print a
+main =  let c = reductionDebug term3
+        in do print c
               putStrLn "----------------"
-              print b
               return ()

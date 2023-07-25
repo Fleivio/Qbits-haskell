@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 module Lambda.Lambda (Term(..), LLT(..), adaptLLT) where
 
 import Lambda.Term
@@ -13,12 +14,19 @@ data LLT a b c =
     | NonLinAbs (LLT a b c)
     | NonLinTerm (LLT a b c) 
     | App (LLT a b c) (LLT a b c)
-    | LQop (Qop a a)
-    | LQval (Virt a b c)
+    | LGate (Qop a a)
+    | LValue (Virt a b c)
+    | Read (LLT a b c)
 
 adaptLLT :: (Basis a, Basis na, Basis u) => LLT a na u -> Adaptor (a1, a2) a -> LLT a1 (a2, na) u
-adaptLLT (LQval v) a = LQval (virtFromV v a)
-adaptLLT a b = adaptLLT (reductionDebug a) b
+adaptLLT (LValue v) a = LValue (virtFromV v a)
+adaptLLT v a = case reductionDebug v of
+    (LinAbs v1) -> LinAbs (adaptLLT v1 a)
+    (NonLinAbs v1) -> NonLinAbs (adaptLLT v1 a)
+    (NonLinTerm v1) -> NonLinTerm (adaptLLT v1 a)
+    (App v1 v2) -> App (adaptLLT v1 a) (adaptLLT v2 a)
+    (Var i) -> Var i
+    LValue v1 -> adaptLLT (LValue v1) a
 
 instance (Basis a, Basis b, Basis c) => Eq (LLT a b c) where
     Var i == Var j = i == j
@@ -26,8 +34,9 @@ instance (Basis a, Basis b, Basis c) => Eq (LLT a b c) where
     NonLinAbs t1 == NonLinAbs t2 = t1 == t2
     NonLinTerm t1 == NonLinTerm t2 = t1 == t2
     App t1 t2 == App t3 t4 = t1 == t3 && t2 == t4
-    LQop _ == LQop _ = True
-    LQval _ == LQval _ = True
+    Read t1 == Read t2 = t1 == t2
+    LGate _ == LGate _ = True
+    LValue _ == LValue _ = True
     _ == _ = False
 
 instance (Basis a, Basis b, Basis c) => Show (LLT a b c) where 
@@ -36,8 +45,9 @@ instance (Basis a, Basis b, Basis c) => Show (LLT a b c) where
     show (NonLinAbs t) = "λ!" ++ show t
     show (LinAbs t)    = "λ" ++ show t
     show (NonLinTerm t) = "!(" ++ show t ++ ")"
-    show (LQop q) = show q 
-    show (LQval v) = show v
+    show (LGate q) = show q 
+    show (LValue v) = show v
+    show (Read t) = "read[" ++ show t ++ "]"
 
 instance (Basis a, Basis b, Basis c) => Term (LLT a b c) where
     isValue (App _ _) = False
@@ -50,12 +60,20 @@ instance (Basis a, Basis b, Basis c) => Term (LLT a b c) where
         | isValue v              = betaReduct v t            -- beta
     reductionRun (App (NonLinAbs t) (NonLinTerm v)) 
                                  = betaReduct v t            -- !beta
-    reductionRun (App (LQop q) (LQval v))
-         = unsafePerformIO (
+    reductionRun (App (LGate q) (LValue v))
+        = unsafePerformIO (
             do  _ <- app1 q v
-                return $ LQval v                             -- qop 
-            ) 
-    reductionRun a = a                                       -- id
+                return $ LValue v                             -- qop 
+            )
+    reductionRun (Read (LValue v))
+        = unsafePerformIO (
+            do  _ <- observeVV v
+                return $ LValue v                             -- read
+            )
+
+    -- base cases
+    reductionRun (Read t) = Read (reductionRun t)            
+    reductionRun a = a                                       
 
     shift d = walk 0
         where walk c t = case t of

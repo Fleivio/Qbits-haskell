@@ -11,12 +11,14 @@ import Quantum.Value
 import Lambda.Lambda
 import Virtual.Adaptor
 
-term2 :: LLT Bool (Bool, ()) (Bool, Bool)
-term2 = adaptLLT (LQop cnot `App` LQval (virtFromR $ unsafePerformIO (mkQR (mkQV [((False, True), 1)]) ))) ad_pair1
+term2 = adaptLLT (LGate toffoli `App` LValue (virtFromR $ unsafePerformIO (mkQR ( bra_1_ket &* bra_1_ket &* bra_0_ket )))) ad_triple1
 
 term :: LLT Bool () Bool
-term = LQop xGate `App` (LQop hGate `App` ( NonLinAbs (lId `App` NonLinTerm (Var 0))  
-                                    `App` NonLinTerm ( LQval virtOne )))
+term = Read $ LGate xGate `App` (LGate hGate `App` ( NonLinAbs (lId `App` NonLinTerm (Var 0))  
+                                    `App` NonLinTerm ( LValue virtOne )))
+
+
+
 
 
 main :: IO ()

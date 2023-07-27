@@ -30,6 +30,7 @@ library
       BB84.Person
       BoolOperators
       Lambda.BasicFunctions
+      Lambda.Constant
       Lambda.Lambda
       Lambda.Term
       Quantum.Basis

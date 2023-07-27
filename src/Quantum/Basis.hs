@@ -1,6 +1,8 @@
 module Quantum.Basis (Basis, basis) where
 
-class (Eq a, Ord a, Show a) => Basis a where
+import Data.Typeable
+
+class (Eq a, Ord a, Show a, Typeable a) => Basis a where
   basis :: [a]
 
 -- Base para o tipo bool

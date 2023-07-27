@@ -5,15 +5,23 @@ import Lambda.Term
 import GHC.IO
 import Lambda.Constant
 
-data LLT = 
+data LLT =
+    --Classic 
       Var Int
-    | LinAbs LLT
     | NonLinAbs LLT
     | NonLinTerm LLT 
     | App LLT LLT
-    | LGate QGate
+    --Lineaar
+    | LinAbs LLT
+    --Variables
+    -- | Def String LLT
+    -- | Let VarTable LLT
+    --Quantum
     | LValue QValue
+    | LAdaptor QAdaptor LLT
+    | LGate QGate
     | Read LLT
+
 
 -- adaptLLT :: (Basis a, Basis na, Basis u) => LLT a na u -> Adaptor (a1, a2) a -> LLT a1 (a2, na) u
 -- adaptLLT (LValue v) a = LValue (virtFromV v a)
@@ -34,6 +42,7 @@ instance Eq LLT where
     Read t1 == Read t2 = t1 == t2
     LGate _ == LGate _ = True
     LValue _ == LValue _ = True
+    LAdaptor _ _ == LAdaptor _ _ = True
     _ == _ = False
 
 instance Show LLT where 
@@ -44,6 +53,7 @@ instance Show LLT where
     show (NonLinTerm t) = "!(" ++ show t ++ ")"
     show (LGate q) = show q
     show (LValue v) = show v
+    show (LAdaptor _ v) = "adapt " ++ show v
     show (Read t) = "read[" ++ show t ++ "]"
 
 instance Term LLT where
@@ -67,8 +77,12 @@ instance Term LLT where
             do _ <- readValue v
                return $ LValue v                            -- read
             )
+    reductionRun (LAdaptor ad (LValue v))
+        = reductionRun $ LValue $ adaptValue v ad
 
     -- base cases
+    reductionRun (App (LGate q) t) = App (LGate q) (reductionRun t)
+    reductionRun (LAdaptor ad t) = LAdaptor ad (reductionRun t)
     reductionRun (Read t) = Read (reductionRun t)            
     reductionRun a = a                                       
 

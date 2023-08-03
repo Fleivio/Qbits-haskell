@@ -11,22 +11,40 @@ import Virtual.VirtualValue
 import Quantum.Operators
 import Virtual.Adaptor
 
-data QGate = forall a b. (Basis a, Basis b) => QGate (Qop a b) 
+data QGate = forall a b. (Basis a, Basis b) => QGate (Qop a b)
 data QValue = forall a b c. (Basis a, Basis b, Basis c) => QValue (Virt a b c)
 data QAdaptor = forall a b c. (Basis a, Basis b, Basis c) => QAdaptor (Adaptor (a, b) c)
 
 instance Show QGate where
     show (QGate op) = show op
 
+instance Eq QGate where
+    (QGate (op1 :: Qop a1 a2)) == (QGate (op2 :: Qop a3 a4)) 
+        = case eqT @a1 @a3 of
+            Just Refl -> case eqT @a2 @a4 of
+                Just Refl -> op1 == op2
+                _ -> False
+            _ -> False
+
 instance Show QValue where
     show (QValue v) = show v
+
+instance Eq QValue where
+    (QValue (_ :: Virt a1 b1 c1)) == (QValue (_ :: Virt a2 b2 c2)) 
+        = case eqT @a1 @a2 of
+            Just Refl -> case eqT @b1 @b2 of
+                Just Refl -> case eqT @c1 @c2 of
+                    Just Refl -> True
+                    _ -> False
+                _ -> False
+            _ -> False
 
 instance Show QAdaptor where
     show _ = "adaptor"
 
 adaptValue :: QValue -> QAdaptor -> QValue
-adaptValue (QValue (v :: Virt a rest u)) (QAdaptor (ad :: Adaptor (a1, a2) c)) 
-    = case eqT @a @c of
+adaptValue (QValue (v :: Virt a rest u)) (QAdaptor (ad :: Adaptor (f1, f2) t)) 
+    = case eqT @a @t of
         Just Refl -> QValue (virtFromV v ad)
         _ -> error "Cound't match adaptor with value basis"
 

@@ -11,25 +11,29 @@ import Quantum.Value
 import Lambda.Lambda
 import Virtual.Adaptor
 
--- term2 = adaptLLT (LGate toffoli `App` LValue (virtFromR $ unsafePerformIO (mkQR ( bra_1_ket &* bra_1_ket &* bra_0_ket )))) ad_triple1
+{-
+ let x = (1,1,0)
+ let y = snd (cnot x)
+ in read (H y)
+-}
 
-term = Read $ LGate (QGate xGate) `App` (LGate (QGate hGate) `App` ( NonLinAbs (lId `App` NonLinTerm (Var 0))
-                                    `App` NonLinTerm ( LValue (QValue virtOne) )))
+adaptSnd :: LLT -> LLT
+adaptSnd  = LAdaptor (QAdaptor (ad_triple2 :: Adaptor (Bool, (Bool, Bool)) ((Bool, Bool), Bool)))
 
 
-adaptT1 :: LLT -> LLT
-adaptT1  = LAdaptor (QAdaptor (ad_triple1 :: Adaptor (Bool, (Bool, Bool)) ((Bool, Bool), Bool)))
+term1 :: LLT
+term1 = Let [("x", LValue (QValue (virtFromR $ unsafePerformIO (mkQR ( bra_1_ket &* bra_1_ket &* bra_0_ket )))))] $
+         Let [("y", adaptSnd (LGate (QGate toffoli) `App` (Def "x")))] 
+         (LGate (QGate hGate) `App` (Def "y"))
 
-term3 :: LLT
-term3 = LGate (QGate hGate) `App` (adaptT1 (LValue value))
-      where value = QValue (virtFromR $ unsafePerformIO (mkQR ( bra_1_ket &* bra_1_ket &* bra_0_ket )))
+{-
+ let x = (H 1, 1)
+ in cnot x
+-}
 
--- let x = 1,0,1,1 tipo total
---     y = adaptor_13 x
---     cnot y 
 
 main :: IO ()
-main =  let c = reductionDebug term3
+main =  let c = reductionDebug [] term1 
         in do print c
               putStrLn "----------------"
               return ()

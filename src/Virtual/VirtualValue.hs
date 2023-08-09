@@ -21,7 +21,6 @@ virtOne = virtFromR $ unsafePerformIO $ mkQR (mkQV [(True, 1)])
 virtZero :: Virt Bool () Bool
 virtZero = virtFromR $ unsafePerformIO $ mkQR (mkQV [(False, 1)]) 
 
-
 -- Cria um valor virtual a partir de uma unica referencia
 virtFromR :: QR a -> Virt a () a
 virtFromR r = Virt r (Adaptor {dec = \a -> (a,()), cmp = \(a,()) -> a})

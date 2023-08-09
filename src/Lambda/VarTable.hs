@@ -6,7 +6,7 @@ type VarTable a = [(VarName, a)]
 
 
 lookUpVar :: VarTable a -> VarName -> Maybe a 
-lookUpVar [] n = trace ("Nada de " ++ show n) Nothing
+lookUpVar [] n = trace (show n ++ " not found") Nothing
 lookUpVar ((name, val):xs) name' 
     | name == name' = Just val
     | otherwise = lookUpVar xs name'

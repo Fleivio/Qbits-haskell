@@ -1,7 +1,11 @@
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeApplications #-}
-module Lambda.Constant(CnstGate(..), CnstValue(..), CnstAdaptor(..), gateApply, readValue, adaptValue) where
+module Lambda.Constant(
+    CnstGate(..), CnstValue(..), CnstAdaptor(..),
+    cnstApp, cnstRead, cnstAdapt, cnstTensor,
+    cnstH, cnstX, cnstY, cnstZ, cnstId, cnstCnot, cnstToff, cnst1, cnst0
+    ) where
 
 import Data.Typeable
 
@@ -10,6 +14,10 @@ import Quantum.Basis
 import Virtual.VirtualValue
 import Quantum.Operators
 import Virtual.Adaptor
+import BoolOperators
+import GHC.IO (unsafePerformIO)
+import Reference.Reference
+import Quantum.Value
 
 data CnstGate = forall a b. (Basis a, Basis b) => CnstGate (Qop a b)
 data CnstValue = forall a b c. (Basis a, Basis b, Basis c) => CnstValue (Virt a b c)
@@ -42,23 +50,54 @@ instance Eq CnstValue where
 instance Show CnstAdaptor where
     show _ = "adaptor"
 
-adaptValue :: CnstValue -> CnstAdaptor -> CnstValue
-adaptValue (CnstValue (v :: Virt a rest u)) (CnstAdaptor (ad :: Adaptor (f1, f2) t)) 
+cnstAdapt :: CnstValue -> CnstAdaptor -> CnstValue
+cnstAdapt (CnstValue (v :: Virt a rest u)) (CnstAdaptor (ad :: Adaptor (f1, f2) t)) 
     = case eqT @a @t of
         Just Refl -> CnstValue (virtFromV v ad)
         _ -> error "Cound't match adaptor with value basis"
 
-gateApply :: CnstGate -> CnstValue -> IO()
-gateApply (CnstGate (op :: Qop a1 a2)) (CnstValue (v :: Virt a3 b c)) 
+cnstApp :: CnstGate -> CnstValue -> IO()
+cnstApp (CnstGate (op :: Qop a1 a2)) (CnstValue (v :: Virt a3 b c)) 
     = case eqT @a1 @a2 of                   -- is transitioning from a1 to a1
       Just Refl -> case eqT @a1 @a3 of      -- basis of operation match basis of value
         Just Refl -> app1 op v
         _ -> error "`Op a a` must match `Val a b c`"
       _ -> error "need an `Op a a`, not a general `Op a b`"
 
-readValue :: CnstValue -> IO ()
-readValue (CnstValue (v :: Virt a1 b c)) 
+cnstRead :: CnstValue -> IO ()
+cnstRead (CnstValue (v :: Virt a1 b c)) 
     = do 
     _ <- observeVV v
     return ()
 
+cnstTensor :: CnstValue -> CnstValue -> IO CnstValue
+cnstTensor (CnstValue (v1 :: Virt a1 b1 c1)) (CnstValue (v2 :: Virt a2 b2 c2)) =
+    do  composed <- virtTensor v1 v2
+        return $ CnstValue composed
+
+cnstH :: CnstGate
+cnstH = CnstGate hGate
+
+cnstX :: CnstGate
+cnstX = CnstGate xGate
+
+cnstY :: CnstGate
+cnstY = CnstGate yGate
+
+cnstZ :: CnstGate
+cnstZ = CnstGate zGate
+
+cnstId :: CnstGate
+cnstId = CnstGate idGate
+
+cnstCnot :: CnstGate
+cnstCnot = CnstGate cnotGate
+
+cnstToff :: CnstGate
+cnstToff = CnstGate toffGate
+
+cnst1 :: CnstValue
+cnst1 = CnstValue (virtFromR (unsafePerformIO (mkQR (mkQV [(True,1)]))))
+
+cnst0 :: CnstValue
+cnst0 = CnstValue (virtFromR (unsafePerformIO (mkQR (mkQV [(False,1)]))))

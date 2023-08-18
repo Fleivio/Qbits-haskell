@@ -1,4 +1,4 @@
-module Virtual.VirtualValue (virtFromR, virtFromV, app, app1, Virt(..), virtTensor, observeVV, virtOne, virtZero) where
+module Virtual.VirtualValue (virtFromR, virtFromV, app, app1, Virt(..), virtTensor, observeVV) where
 
 import Quantum.Value
 import Quantum.Operators
@@ -6,19 +6,12 @@ import Reference.Reference
 import Reference.Observation 
 
 import Virtual.Adaptor ( Adaptor(..) )
-import GHC.IO (unsafePerformIO)
 
 -- Valor virtual que recebe o contexto inteiro e uma funcao que filtra o qbit que temos interesse
 data Virt a rest global = Virt (QR global) (Adaptor (a, rest) global)
 
 instance (Show global) => Show (Virt a rest global) where
     show (Virt ref _ ) = show ref
-
-virtOne :: Virt Bool () Bool
-virtOne = virtFromR $ unsafePerformIO $ mkQR (mkQV [(True, 1)])
-
-virtZero :: Virt Bool () Bool
-virtZero = virtFromR $ unsafePerformIO $ mkQR (mkQV [(False, 1)]) 
 
 -- Cria um valor virtual a partir de uma unica referencia
 virtFromR :: QR a -> Virt a () a

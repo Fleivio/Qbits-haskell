@@ -20,6 +20,7 @@ data LLT = -- Classic
   | LValue CnstValue
   | LAdaptor CnstAdaptor LLT
   | LGate CnstGate
+  | LLT :&*: LLT
   | Read LLT
 
 instance Eq LLT where
@@ -31,9 +32,10 @@ instance Eq LLT where
   Read t1 == Read t2 = t1 == t2
   LGate g1 == LGate g2 = g1 == g2
   LValue v1 == LValue v2 = v1 == v2
-  LAdaptor _ _ == LAdaptor _ _ = True
+  LAdaptor c1 t1 == LAdaptor c2 t2 = t1 == t2
   Def n1 == Def n2 = n1 == n2
   Let v1 n1 == Let v2 n2 = v1 == v2 && n1 == n2
+  a :&*: b == a1 :&*: b1 = a == b && a1 == b1
   _ == _ = False
 
 instance Show LLT where
@@ -48,6 +50,7 @@ instance Show LLT where
   show (Read t) = "read[" ++ show t ++ "]"
   show (Def name) = name
   show (Let vt t) = "let " ++ show vt ++ " in \n" ++ show t
+  show (a :&*: b) = "(" ++ show a ++ ", " ++ show b ++ ")"
 
 isValue :: LLT -> Bool
 isValue (App _ _) = False
@@ -57,34 +60,48 @@ defToLLT :: VarTable LLT -> VarName -> LLT
 defToLLT vt name = maybe (Def name) id (lookUpVar vt name) 
 
 reductionRun :: VarTable LLT -> LLT -> LLT
+-- app
 reductionRun vt (App t1 t2)
-  | not (isValue t1) = App (reductionRun vt t1) t2 -- app 1
-  | not (isValue t2) = App t1 (reductionRun vt t2) -- app 2
+  | not (isValue t1) = App (reductionRun vt t1) t2 
+  | not (isValue t2) = App t1 (reductionRun vt t2)
+-- beta
 reductionRun _ (App (LinAbs t) v)
   | isValue v =
-      betaReduct v t -- beta
+      betaReduct v t
+-- !beta!
 reductionRun _ (App (NonLinAbs t) (NonLinTerm v)) =
-  betaReduct v t -- !beta
+  betaReduct v t
+-- qop
 reductionRun _ (App (LGate q) (LValue v)) =
   unsafePerformIO
     ( do
-        _ <- gateApply q v
-        return $ LValue v -- qop
+        _ <- cnstApp q v
+        return $ LValue v                             
     )
+-- read
 reductionRun _ (Read (LValue v)) =
   unsafePerformIO
     ( do
-        _ <- readValue v
-        return $ LValue v -- read
+        _ <- cnstRead v
+        return $ LValue v                            
     )
+-- tensor
+reductionRun _ ((LValue v1) :&*: (LValue v2)) =
+  unsafePerformIO
+    ( do
+        v3 <- cnstTensor v1 v2
+        return $ LValue v3
+    )
+-- adapt
 reductionRun vt (LAdaptor ad (LValue v)) =
-  reductionRun vt $ LValue $ adaptValue v ad
+  reductionRun vt $ LValue $ cnstAdapt v ad
 -- base cases
 reductionRun vt (App (LGate q) t) = App (LGate q) (reductionRun vt t)
 reductionRun vt (LAdaptor ad t) = LAdaptor ad (reductionRun vt t)
 reductionRun vt (Read t) = Read (reductionRun vt t)
 reductionRun vt (Def name) = defToLLT vt name
 reductionRun vt (Let vt' in') = reductionDebug (varAppend vt vt') in'
+reductionRun vt (v1 :&*: v2) = reductionRun vt v1 :&*: reductionRun vt v2
 reductionRun _ a = a
 
 shift :: Int -> LLT -> LLT

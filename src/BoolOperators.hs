@@ -1,6 +1,6 @@
-module BoolOperators (xGate, yGate, zGate, hGate, cnot, toffoli, idGate,
+module BoolOperators (xGate, yGate, zGate, hGate, cnotGate, toffGate, idGate,
  entangle,
- bra_0_ket, bra_1_ket, bra_phi_m_ket, bra_phi_p_ket, bra_psi_p_ket, bra_psi_m_ket, observeAtBasis, vGate, vtGate, toffoli',
+ bra_0_ket, bra_1_ket, bra_phi_m_ket, bra_phi_p_ket, bra_psi_p_ket, bra_psi_m_ket, observeAtBasis, vGate, vtGate, toffGate',
  ObsBasis(..), deutsch, adder, adderRef) where
 
 import Quantum.Operators
@@ -54,14 +54,14 @@ idGate = qop [((True, True), 1),
               ((False, False), 1)]
             "Id"
 
-cnot :: Qop (Bool, Bool) (Bool, Bool)
-cnot = cqop id xGate "Cnot"
+cnotGate :: Qop (Bool, Bool) (Bool, Bool)
+cnotGate = cqop id xGate "Cnot"
 
-toffoli :: Qop ((Bool, Bool), Bool) ((Bool, Bool), Bool)
-toffoli = cqop (uncurry (&&)) xGate "Toffoli"
+toffGate :: Qop ((Bool, Bool), Bool) ((Bool, Bool), Bool)
+toffGate = cqop (uncurry (&&)) xGate "Toffoli"
 
 entangle :: QV Bool -> QV Bool -> QV (Bool, Bool)
-entangle q1 q2 = qApp cnot (qApp hGate q1 &* q2)
+entangle q1 q2 = qApp cnotGate (qApp hGate q1 &* q2)
 
 observeAtBasis :: ObsBasis -> QR Bool -> IO Bool
 observeAtBasis Z qr =
@@ -75,14 +75,14 @@ observeAtBasis X qr =
         qrApplyOp hGate qr
         return a
 
-toffoli' :: (Basis na, Basis u) => Virt ((Bool, Bool), Bool) na u -> IO()
-toffoli' triple = 
+toffGate' :: (Basis na, Basis u) => Virt ((Bool, Bool), Bool) na u -> IO()
+toffGate' triple = 
     do
         app1 hGate b
         app1 cv mb
-        app1 cnot tm
+        app1 cnotGate tm
         app1 cvt mb
-        app1 cnot tm
+        app1 cnotGate tm
         app1 cv tb
         app1 hGate b
     where
@@ -120,11 +120,11 @@ adder inc x y =
             vyio = virtFromV v ad_quad234
             vyi = virtFromV v ad_quad23
             vio = virtFromV v ad_quad34
-        app1 toffoli vxyo
-        app1 cnot vxy
-        app1 toffoli vyio
-        app1 cnot vyi
-        app1 cnot vxy
+        app1 toffGate vxyo
+        app1 cnotGate vxy
+        app1 toffGate vyio
+        app1 cnotGate vyi
+        app1 cnotGate vxy
         (sumR, carryOut) <- observeVV vio
         putStrLn $ qvToString x ++ " +. " ++ qvToString y ++ " +. " ++ qvToString inc
         putStrLn $ "Sum = " ++ show sumR ++ "\nCarry = " ++ show carryOut

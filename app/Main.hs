@@ -41,13 +41,12 @@ term2 = LinAbs virtZ1 `App` (LGate (QGate hGate) `App` virtZ2)
 
 main :: IO ()
 main =  do
-    a <- mkQR (bra_0_ket &* bra_1_ket) 
-    b <- mkQR (bra_0_ket)
-
-    c <- qrTensor a b
-
-    print c
-
-    let k = bra_0_ket &* bra_1_ket &* bra_0_ket 
-    print $ k
+    a <- mkQR (bra_1_ket &* bra_1_ket) 
+    b <- mkQR bra_0_ket
+    let c = virtFromR a
+        d = virtFromR b
+        c1 = virtFromV c ad_pair1
     
+    comp <- virtTensor c1 d
+    app1 cnot comp
+    print comp

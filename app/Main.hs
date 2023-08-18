@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -Wno-unused-top-binds #-}
 module Main (main) where
 
 import Lambda.Lambda
@@ -19,24 +20,24 @@ virtZ3 :: Virt ((Bool, Bool), Bool) () ((Bool, Bool), Bool)
 virtZ3 = virtFromR $ unsafePerformIO (mkQR ( bra_1_ket &* bra_1_ket &* bra_0_ket ))
 
 adaptTrd :: LLT -> LLT
-adaptTrd  = LAdaptor (QAdaptor (ad_triple3 :: Adaptor (Bool, (Bool, Bool)) ((Bool, Bool), Bool)))
+adaptTrd  = LAdaptor (CnstAdaptor (ad_triple3 :: Adaptor (Bool, (Bool, Bool)) ((Bool, Bool), Bool)))
 
 term1 :: LLT
-term1 = Let [("x", LValue (QValue virtZ3))] $
-         Let [("y", adaptTrd (LGate (QGate toffoli) `App` Def "x"))] $
-         Read (LGate (QGate hGate) `App` Def "y")
+term1 = Let [("x", LValue (CnstValue virtZ3))] $
+         Let [("y", adaptTrd (LGate (CnstGate toffoli) `App` Def "x"))] $
+         Read (LGate (CnstGate hGate) `App` Def "y")
 
 {-
 (\x. 1) (H 0)
 -}
 
 virtZ2 :: LLT
-virtZ2 =  LValue (QValue (virtFromR $ unsafePerformIO (mkQR bra_0_ket)))
+virtZ2 =  LValue (CnstValue (virtFromR $ unsafePerformIO (mkQR bra_0_ket)))
 virtZ1 :: LLT
-virtZ1 =  LValue (QValue (virtFromR $ unsafePerformIO (mkQR bra_1_ket)))
+virtZ1 =  LValue (CnstValue (virtFromR $ unsafePerformIO (mkQR bra_1_ket)))
 
 term2 :: LLT
-term2 = LinAbs virtZ1 `App` (LGate (QGate hGate) `App` virtZ2)
+term2 = LinAbs virtZ1 `App` (LGate (CnstGate hGate) `App` virtZ2)
 
 
 main :: IO ()

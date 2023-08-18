@@ -4,7 +4,6 @@ import Quantum.Value
 import Quantum.Operators
 import Reference.Reference
 import Reference.Observation 
-import Data.IORef 
 
 import Virtual.Adaptor ( Adaptor(..) )
 import GHC.IO (unsafePerformIO)

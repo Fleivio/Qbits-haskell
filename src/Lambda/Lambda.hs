@@ -17,9 +17,9 @@ data LLT = -- Classic
   | Def VarName 
   | Let (VarTable LLT) LLT
    -- Quantum
-  | LValue QValue
-  | LAdaptor QAdaptor LLT
-  | LGate QGate
+  | LValue CnstValue
+  | LAdaptor CnstAdaptor LLT
+  | LGate CnstGate
   | Read LLT
 
 instance Eq LLT where

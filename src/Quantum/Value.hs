@@ -1,4 +1,4 @@
-module Quantum.Value (getProb, (&*), mkQV, qvToString, QV, Basis(..), PA, squareModulus, addPA) where
+module Quantum.Value (QV, Basis(..), PA, getProb, (&*), mkQV, qvToString, qvTensor, squareModulus, addPA) where
 
 import Quantum.Basis
 import Quantum.ProbabilityAmplitude
@@ -16,6 +16,9 @@ getProb qvalue index = Map.findWithDefault 0 index qvalue
 -- produto tensorial 
 (&*) :: (Basis a, Basis b) => QV a -> QV b -> QV (a, b)
 (&*) qa qb = mkQV [((a, b), getProb qa a * getProb qb b) | (a, b) <- basis]
+
+qvTensor :: (Basis a, Basis b) => QV a -> QV b -> QV (a, b)
+qvTensor = (&*)
 
 -- cria um quantum value a partir de uma lista
 mkQV :: Basis a => [(a, PA)] -> QV a

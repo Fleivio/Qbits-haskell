@@ -1,4 +1,4 @@
-module Reference.Reference (mkQR, QR(..), qrApplyOp, qrPrint, qrToString, readIORef, writeIORef) where
+module Reference.Reference (mkQR, QR(..), (&&*), qrTensor, qrApplyOp, qrPrint, qrToString, readIORef, writeIORef) where
 
 import Quantum.Operators
 import Quantum.Value
@@ -19,6 +19,17 @@ mkQR qVal =
     do
         r <- newIORef qVal
         return (QR r)
+
+(&&*) :: (Basis a, Basis b) => QR a -> QR b -> IO (QR (a, b))
+(&&*) = qrTensor
+
+qrTensor :: (Basis a, Basis b) => QR a -> QR b -> IO (QR (a, b))
+qrTensor (QR ptrQval1) (QR ptrQval2) =
+    do
+        qVal1 <- readIORef ptrQval1
+        qVal2 <- readIORef ptrQval2
+        let tqv = qVal1 &* qVal2
+        mkQR tqv
 
 -- aplica uma operação a uma referência, atualiza o resultado
 qrApplyOp :: (Basis a) => Qop a a -> QR a -> IO ()

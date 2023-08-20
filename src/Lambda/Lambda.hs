@@ -29,7 +29,7 @@ instance Eq LLT where
   Read t1 == Read t2 = t1 == t2
   LGate g1 == LGate g2 = g1 == g2
   LValue v1 == LValue v2 = v1 == v2
-  LAdaptor c1 t1 == LAdaptor c2 t2 = t1 == t2
+  LAdaptor _ t1 == LAdaptor _ t2 = t1 == t2
   Def n1 == Def n2 = n1 == n2
   Let v1 n1 == Let v2 n2 = v1 == v2 && n1 == n2
   a :&*: b == a1 :&*: b1 = a == b && a1 == b1

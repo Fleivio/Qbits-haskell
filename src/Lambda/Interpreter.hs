@@ -15,9 +15,9 @@ reductionRun vt t = case t of
     (App t1 t2) | not (isValue t1) -> App (reductionRun vt t1) t2
                 | not (isValue t2) -> App t1 (reductionRun vt t2)
     -- beta
-    (App (LinAbs t) v) | isValue v -> betaReduct v t
+    (App (LinAbs t1) v) | isValue v -> betaReduct v t1
     -- !beta!
-    (App (NonLinAbs t) (NonLinTerm v)) | isValue v -> betaReduct v t
+    (App (NonLinAbs t1) (NonLinTerm v)) | isValue v -> betaReduct v t1
     -- qop
     (App (LGate q) (LValue v)) ->
         unsafePerformIO
@@ -43,9 +43,9 @@ reductionRun vt t = case t of
     (LAdaptor ad (LValue v)) ->
         reductionRun vt $ LValue $ cnstAdapt v ad
     -- base cases
-    (App (LGate q) t) -> App (LGate q) (reductionRun vt t)
-    (LAdaptor ad t) -> LAdaptor ad (reductionRun vt t)
-    (Read t)        -> Read (reductionRun vt t)
+    (App (LGate q) t1) -> App (LGate q) (reductionRun vt t1)
+    (LAdaptor ad t1) -> LAdaptor ad (reductionRun vt t1)
+    (Read t1)        -> Read (reductionRun vt t1)
     (Def name)      -> defToLLT vt name
     (Let vt' in')   -> reductionRun (varAppend vt vt') in'
     (v1 :&*: v2)    -> reductionRun vt v1 :&*: reductionRun vt v2
@@ -54,8 +54,8 @@ reductionRun vt t = case t of
 reduction :: VarTable LLT -> LLT -> ResLLT
 reduction vt t =
   let t' = reductionRun vt t
-      log = show t ++ " >>> " ++ show t' ++ "\n"
-      result = Res t' log
+      log' = show t ++ " >>> " ++ show t' ++ "\n"
+      result = Res t' log'
   in if t' == t
         then result
         else result >>= reduction vt

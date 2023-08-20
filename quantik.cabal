@@ -31,7 +31,9 @@ library
       BoolOperators
       Lambda.BasicFunctions
       Lambda.Constant
+      Lambda.Interpreter
       Lambda.Lambda
+      Lambda.ResultLog
       Lambda.VarTable
       Quantum.Basis
       Quantum.Operators

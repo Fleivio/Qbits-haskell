@@ -1,7 +1,7 @@
 module Lambda.ResultLog(ResultLog(..)) where
 
 type Log = String
-data ResultLog a = Res a Log
+data ResultLog a = Res {res :: a, log :: Log}
 
 instance Show a => Show (ResultLog a) where
     show (Res _ s) = s

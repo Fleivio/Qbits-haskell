@@ -47,7 +47,7 @@ reductionRun vt t = case t of
     (LAdaptor ad t1) -> LAdaptor ad (reductionRun vt t1)
     (Read t1)        -> Read (reductionRun vt t1)
     (Def name)      -> defToLLT vt name
-    (Let vt' in')   -> reductionRun (varAppend vt vt') in'
+    (Let vt' in')   -> res $ reduction (varAppend vt vt') in'
     (v1 :&*: v2)    -> reductionRun vt v1 :&*: reductionRun vt v2
     a -> a
 

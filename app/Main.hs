@@ -32,5 +32,7 @@ main :: IO ResLLT
 main = 
     do 
         a <- reduction [] deutch1 
+        
         print a
+
         return undefined

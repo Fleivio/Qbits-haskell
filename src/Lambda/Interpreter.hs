@@ -1,13 +1,11 @@
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 {-# HLINT ignore "Use <&>" #-}
-module Lambda.Interpreter(reduction, match1, ResLLT) where
+module Lambda.Interpreter(reduction, ResLLT) where
 
 import Lambda.Lambda
 import Lambda.VarTable
-import GHC.IO
 import Lambda.Constant
 
-import Debug.Trace
 import Control.Concurrent
 
 import Lambda.ResultLog
@@ -51,10 +49,6 @@ reduction vt t = do
     if t' == t
         then return result
         else (\r -> do
-                reduction vt (res r)
+                r1 <- reduction vt (res r)
+                return $ concatRes r r1 
              ) result
-
-match1 :: (VarName, VarName) -> LLT -> [(VarName, LLT)]
-match1 (n1, n2) expr = case unsafePerformIO (reduction [] expr) of
-    Res v1 _  -> [(n1, LAdaptor cnstAdapt1 v1), (n2, LAdaptor cnstAdapt2 v1)]
-    _ -> error "Expression cannot be reduced to a qubit"

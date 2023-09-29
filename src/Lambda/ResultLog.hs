@@ -1,7 +1,10 @@
-module Lambda.ResultLog(ResultLog(..)) where
+module Lambda.ResultLog(ResultLog(..), concatRes) where
 
 type Log = String
 data ResultLog a = Res {res :: a, log :: Log}
+
+concatRes :: ResultLog a -> ResultLog a -> ResultLog a
+concatRes (Res _ l1) (Res r l2) = Res r (l1 ++ l2)
 
 instance Show a => Show (ResultLog a) where
     show (Res _ s) = s

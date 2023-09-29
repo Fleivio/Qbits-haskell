@@ -8,6 +8,7 @@ import GHC.IO
 import Lambda.Constant
 
 import Debug.Trace
+import Control.Concurrent
 
 import Lambda.ResultLog
 
@@ -42,13 +43,14 @@ reductionRun vt t = case t of
 
 reduction :: VarTable LLT -> LLT -> IO ResLLT
 reduction vt t = do
+    threadDelay 10000
     t' <- reductionRun vt t
     let
         log' = show t ++ " >>> " ++ show t' ++ "\n"
         result = Res t' log'
     if t' == t
         then return result
-        else trace (show result) $ (\r -> do
+        else (\r -> do
                 reduction vt (res r)
              ) result
 

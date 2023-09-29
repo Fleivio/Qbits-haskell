@@ -10,15 +10,15 @@ data LLT = -- Classic
   | App LLT LLT
    -- Linear
   | LinAbs LLT
-   -- Variables
-  | Def VarName 
-  | Let (VarTable LLT) LLT
    -- Quantum
   | LValue CnstValue
   | LAdaptor CnstAdaptor LLT
   | LGate CnstGate
   | LLT :&*: LLT
   | Read LLT
+   -- Variables
+  | Def VarName 
+  | Let (VarTable LLT) LLT
 
 instance Eq LLT where
   Var i == Var j = i == j

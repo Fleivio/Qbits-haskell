@@ -1,4 +1,4 @@
-{-# OPTIONS_GHC -Wno-unused-top-binds #-}
+-- {-# OPTIONS_GHC -Wno-unused-top-binds #-}
 module Main (main) where
 
 import Lambda.Lambda
@@ -7,20 +7,26 @@ import Lambda.Constant
 import Virtual.Adaptor
 
 import Lambda.Interpreter
-{-
-x = (H 1, 0)
--}
 
-adapt1 :: CnstAdaptor
-adapt1 = CnstAdaptor (ad_pair1 :: Adaptor (Bool, Bool) (Bool, Bool)) 
 
 term3 :: LLT
 term3 = ( LGate (CnstGate hGate) `App` LValue cnst1) :&*: LValue cnst0
 
-deutch1 :: LLT 
-deutch1 = Let [("x", LGate cnstCnot `App` ((LGate (CnstGate hGate) `App` LValue cnst1) :&*: (LGate (CnstGate hGate) `App` LValue cnst0)))]
-                (LGate cnstH `App` LAdaptor adapt1 (Def "x"))
 
 
-main :: IO ()
-main = print $ reduction [] deutch1
+deutsch1 :: LLT
+deutsch1 = Let (("x1", "x2") `match1`
+                 (LGate cnstCnot `App`
+                    (LGate (CnstGate hGate) `App` LValue cnst1 :&*: LGate (CnstGate hGate) `App` LValue cnst0)))
+                (LGate cnstH `App` LAdaptor cnstAdapt1 (Def "x1"))
+
+
+-- deutsch2 :: LLT 
+-- deutsch2 =   Let [("x1", LGate (CnstGate hGate) `App` LValue cnst1),
+--                  ("x2", LGate (CnstGate hGate) `App` LValue cnst0)] $
+--             NonLazyLet [("x", LGate cnstCnot `App` (Def "x1" :&*: Def "x2"))]
+--             (LGate cnstH `App` Def "x1")
+
+
+main :: IO ResLLT
+main = reduction [] deutsch1

@@ -4,7 +4,7 @@
 module Lambda.Constant(
     CnstGate(..), CnstValue(..), CnstAdaptor(..),
     cnstApp, cnstRead, cnstAdapt, cnstTensor,
-    cnstH, cnstX, cnstY, cnstZ, cnstId, cnstCnot, cnstToff, cnst1, cnst0
+    cnstH, cnstX, cnstY, cnstZ, cnstId, cnstCnot, cnstToff, cnst1, cnst0, cnstAdapt1, cnstAdapt2
     ) where
 
 import Data.Typeable
@@ -101,3 +101,9 @@ cnst1 = CnstValue (virtFromR (unsafePerformIO (mkQR (mkQV [(True,1)]))))
 
 cnst0 :: CnstValue
 cnst0 = CnstValue (virtFromR (unsafePerformIO (mkQR (mkQV [(False,1)]))))
+
+cnstAdapt1 :: CnstAdaptor
+cnstAdapt1 = CnstAdaptor (ad_pair1 :: Adaptor (Bool, Bool) (Bool, Bool))
+
+cnstAdapt2 :: CnstAdaptor
+cnstAdapt2 = CnstAdaptor (ad_pair2 :: Adaptor (Bool, Bool) (Bool, Bool))

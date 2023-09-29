@@ -14,8 +14,8 @@ type ResLLT = ResultLog LLT
 
 reductionRun :: VarTable LLT -> LLT -> IO LLT
 reductionRun vt t = case t of
-    (App t1 t2) | not (isValue t1) -> reductionRun vt t1 >>= \x -> return $ App x t2
-                | not (isValue t2) -> reductionRun vt t2 >>= \x -> return $ App t1 x
+    (App t1 t2) | not (isValue t1)  -> reductionRun vt t1 >>= \x -> return $ App x t2
+                | not (isValue t2)  -> reductionRun vt t2 >>= \x -> return $ App t1 x
     (App (LinAbs t1) v) | isValue v -> return $ betaReduct v t1
     (App (NonLinAbs t1) (NonLinTerm v)) | isValue v -> return $ betaReduct v t1
     (App (LGate q) (LValue v)) -> do
@@ -28,12 +28,12 @@ reductionRun vt t = case t of
         v3 <- cnstTensor v1 v2
         return $ LValue v3
     (LAdaptor ad (LValue v)) -> reductionRun vt $ LValue $ cnstAdapt v ad
-    (App (LGate q) t1) ->  reductionRun vt t1 >>= return . App (LGate q)
+    (App (LGate q) t1)       ->  reductionRun vt t1 >>= return . App (LGate q)
     (LAdaptor ad t1) -> reductionRun vt t1 >>= return . LAdaptor ad
     (Read t1)        -> fmap Read (reductionRun vt t1)
-    (Def name)      -> return $ defToLLT vt name
-    (Let vt' in')   -> reduction (varAppend vt vt') in' >>= return . res
-    (v1 :&*: v2)    -> do
+    (Def name)       -> return $ defToLLT vt name
+    (Let vt' in')    -> reduction (varAppend vt vt') in' >>= return . res
+    (v1 :&*: v2)     -> do
         a <- reductionRun vt v1
         b <- reductionRun vt v2
         return $ a :&*: b

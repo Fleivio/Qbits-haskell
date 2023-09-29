@@ -56,23 +56,25 @@ cnstAdapt (CnstValue (v :: Virt a rest u)) (CnstAdaptor (ad :: Adaptor (f1, f2) 
         Just Refl -> CnstValue (virtFromV v ad)
         _ -> error "Cound't match adaptor with value basis"
 
-cnstApp :: CnstGate -> CnstValue -> IO()
+cnstApp :: CnstGate -> CnstValue -> IO ()
 cnstApp (CnstGate (op :: Qop a1 a2)) (CnstValue (v :: Virt a3 b c)) 
-    = case eqT @a1 @a2 of                   -- is transitioning from a1 to a1
-      Just Refl -> case eqT @a1 @a3 of      -- basis of operation match basis of value
-        Just Refl -> app1 op v
-        _ -> error "`Op a a` must match `Val a b c`"
-      _ -> error "need an `Op a a`, not a general `Op a b`"
+    = 
+        case eqT @a1 @a2 of                   -- is transitioning from a1 to a1
+            Just Refl -> case eqT @a1 @a3 of      -- basis of operation match basis of value
+                Just Refl -> app1 op v
+                _ -> error "`Op a a` must match `Val a b c`"
+            _ -> error "need an `Op a a`, not a general `Op a b`"
 
 cnstRead :: CnstValue -> IO ()
 cnstRead (CnstValue (v :: Virt a1 b c)) 
     = do 
-    _ <- observeVV v
-    return ()
+        _ <- observeVV v
+        return ()   
 
 cnstTensor :: CnstValue -> CnstValue -> IO CnstValue
-cnstTensor (CnstValue (v1 :: Virt a1 b1 c1)) (CnstValue (v2 :: Virt a2 b2 c2)) =
-    do  composed <- virtTensor v1 v2
+cnstTensor (CnstValue (v1 :: Virt a1 b1 c1)) (CnstValue (v2 :: Virt a2 b2 c2))
+    = do  
+        composed <- virtTensor v1 v2
         return $ CnstValue composed
 
 cnstH :: CnstGate
